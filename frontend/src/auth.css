@@ -1,0 +1,117 @@
+.auth-container {
+  max-width: 420px;
+  margin: 4rem auto;
+  font-family: "Inter", system-ui, sans-serif;
+  text-align: center;
+  background-color: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.auth-container h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #5a5bef;
+  box-shadow: 0 0 0 3px rgba(90, 91, 239, 0.15);
+}
+
+.submit-btn {
+  background-color: #5a5bef;
+  color: white;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.submit-btn:hover {
+  background-color: #4c4dd9;
+}
+
+.toggle-text {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: #5a5bef;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.toggle-btn:hover {
+  text-decoration: underline;
+}
+
+.error-text {
+  color: #d9534f;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  background-color: #5a5bef;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.25s ease;
+}
+
+.logout-btn:hover {
+  background-color: #4c4dd9;
+}
+
+.course-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+  text-align: left;
+  margin: 0.5rem 0 0.5rem;
+}
+.course-box label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: #333; /* This controls the checkbox text color */
+  cursor: pointer;
+}
+
+.course-box label:hover {
+  color: #5a5bef; /* Optional: hover effect for text */
+}
+
+/* Style the actual checkbox */
+.course-box input[type="checkbox"] {
+  accent-color: #5a5bef; /* Modern way to style checkbox color */
+}
