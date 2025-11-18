@@ -46,29 +46,49 @@ export function AuthProvider({ children }) {
 
       // 3) Get ID token for backend verification (important!)
       const idToken = await u.getIdToken();
+      console.log(
+        "🔑 Firebase ID Token obtained:",
+        idToken.substring(0, 20) + "..."
+      );
 
       // 4) Tell backend to create Postgres profile.
-      //    - Send Authorization: Bearer <idToken>
-      //    - Include credentials if server sets a session cookie here.
-      const res = await fetch("/api/users", {
+      const payload = {
+        uid: u.uid,
+        email: u.email,
+        ...profile, // date_of_birth, grade, gender, courses
+      };
+
+      console.log("📤 Sending payload to backend:", payload);
+      console.log("🌐 Making request to: http://localhost:5000/api/users/");
+
+      const res = await fetch("http://localhost:5000/api/users/", {
         method: "POST",
-        credentials: "include", // keep if server sets cookies here; remove if not needed
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify({
-          uid: u.uid, // 👈 NEW: backend expects this
-          email: u.email, // use the actual Firebase email
-          ...profile, // age, grade, school, gender, courses
-        }),
+        body: JSON.stringify(payload),
       });
 
+      console.log("📥 Response status:", res.status);
+      console.log("📥 Response ok:", res.ok);
+
       if (!res.ok) {
-        const msg = await res.text();
-        // just throw; rollback handled in catch
-        throw new Error(msg || "Failed to create profile.");
+        let errorMsg;
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData.error || errorData.message || "Unknown error";
+          console.log("❌ Backend error response:", errorData);
+        } catch {
+          errorMsg = await res.text();
+          console.log("❌ Backend error text:", errorMsg);
+        }
+        throw new Error(`Backend error (${res.status}): ${errorMsg}`);
       }
+
+      const responseData = await res.json();
+      console.log("✅ Backend success response:", responseData);
 
       // Optional: avoid UI flash before onAuthStateChanged fires
       setUser(u);

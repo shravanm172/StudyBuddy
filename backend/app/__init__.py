@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 
@@ -14,11 +15,35 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+    # EXPLICIT CORS CONFIGURATION FOR FRONTEND
+    CORS(
+        app,
+        resources={
+            r"/api/*": {
+                "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "allow_headers": ["Content-Type", "Authorization"],
+                "supports_credentials": True
+            }
+        }
+    )
+    
+    # Add explicit CORS headers to all responses
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        return response
+
     db.init_app(app)
     migrate.init_app(app, db)
 
     # Register controllers
     from app.controllers.user_controller import bp as user_bp
+    from app.controllers.account_controller import bp as account_bp   # NEW
     app.register_blueprint(user_bp)
+    app.register_blueprint(account_bp)
 
     return app
