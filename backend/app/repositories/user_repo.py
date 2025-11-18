@@ -109,3 +109,36 @@ class UserRepo:
         if exclude_uid:
             query = query.filter(User.uid != exclude_uid)
         return query.first() is not None
+
+    @staticmethod
+    def get_all_users(exclude_uid=None):
+        """
+        Return all users with their profiles and courses as a list of dicts.
+        Excludes the specified UID if provided.
+        """
+        query = (
+            db.session.query(User, UserProfile)
+            .join(UserProfile, User.uid == UserProfile.uid)
+        )
+        
+        if exclude_uid:
+            query = query.filter(User.uid != exclude_uid)
+        
+        results = query.all()
+        users = []
+        
+        for user_obj, profile in results:
+            courses = [
+                uc.course_id for uc in UserCourse.query.filter_by(uid=user_obj.uid).all()
+            ]
+            users.append({
+                "uid": user_obj.uid,
+                "username": user_obj.username,
+                "email": user_obj.email,
+                "date_of_birth": profile.date_of_birth.isoformat() if profile.date_of_birth else None,
+                "grade": profile.grade.value,
+                "gender": profile.gender.value,
+                "courses": courses,
+            })
+        
+        return users

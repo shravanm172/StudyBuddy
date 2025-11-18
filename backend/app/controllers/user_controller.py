@@ -304,3 +304,44 @@ def update_user():
     except Exception as e:
         print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/all/", methods=["GET", "OPTIONS"])
+def get_all_users():
+    """Get all users for people feed (excluding current user)"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    print("👥 === GET ALL USERS REQUEST RECEIVED ===")
+    
+    # Get and verify Firebase token 
+    auth_header = request.headers.get("Authorization", "")
+    print(f"🔑 Auth header present: {bool(auth_header)}")
+    
+    if not auth_header.startswith("Bearer "):
+        print("❌ Invalid authorization header format")
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    
+    token = auth_header.split(" ", 1)[1]
+    print(f"🎫 Extracted token length: {len(token)}")
+    
+    try:
+        from firebase_admin import auth as firebase_auth
+        print("🔍 Verifying Firebase token...")
+        decoded = firebase_auth.verify_id_token(token)
+        firebase_uid = decoded.get("uid")
+        print(f"✅ Token verified! Firebase UID: {firebase_uid}")
+    except Exception as e:
+        print(f"❌ Token verification error: {e}")
+        return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
+    
+    try:
+        # Get all users except the current user
+        all_users = UserRepo.get_all_users(exclude_uid=firebase_uid)
+        print(f"✅ Found {len(all_users)} users")
+        return jsonify({"users": all_users}), 200
+    except Exception as e:
+        print(f"💥 Database error: {e}")
+        return jsonify({"error": str(e)}), 500

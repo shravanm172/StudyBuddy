@@ -57,7 +57,13 @@ export default function Landing() {
         Test Backend /api/users/me
       </button>
 
-      <button onClick={() => navigate("/account")}>Manage Profile</button>
+      <button onClick={() => navigate("/account")} style={{ marginRight: 16 }}>
+        Manage Profile
+      </button>
+
+      <button onClick={() => navigate("/people")}>
+        People Feed
+      </button>
 
       {testError && (
         <p style={{ color: "red", marginTop: 16 }}>
