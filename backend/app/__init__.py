@@ -28,7 +28,7 @@ def create_app():
         }
     )
     
-    # Add explicit CORS headers to all responses
+    # Adding explicit CORS headers to all responses
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
@@ -40,10 +40,19 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    # Import models so Flask-Migrate can detect them
+    from app.models import user  
+    from app.models import direct_request  
+    from app.models import group
+
     # Register controllers
     from app.controllers.user_controller import bp as user_bp
-    from app.controllers.account_controller import bp as account_bp   # NEW
+    from app.controllers.account_controller import bp as account_bp
+    from app.controllers.direct_request_controller import bp as direct_request_bp
+    from app.controllers.group_controller import bp as group_bp
     app.register_blueprint(user_bp)
     app.register_blueprint(account_bp)
+    app.register_blueprint(direct_request_bp)
+    app.register_blueprint(group_bp)
 
     return app

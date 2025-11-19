@@ -61,8 +61,16 @@ export default function Landing() {
         Manage Profile
       </button>
 
-      <button onClick={() => navigate("/people")}>
+      <button onClick={() => navigate("/people")} style={{ marginRight: 16 }}>
         People Feed
+      </button>
+
+      <button onClick={() => navigate("/requests")} style={{ marginRight: 16 }}>
+        My Requests
+      </button>
+
+      <button onClick={() => navigate("/groups")}>
+        My Groups
       </button>
 
       {testError && (
