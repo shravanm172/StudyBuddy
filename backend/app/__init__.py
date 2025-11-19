@@ -50,9 +50,11 @@ def create_app():
     from app.controllers.account_controller import bp as account_bp
     from app.controllers.direct_request_controller import bp as direct_request_bp
     from app.controllers.group_controller import bp as group_bp
+    from app.controllers.course_controller import bp as course_bp
     app.register_blueprint(user_bp)
     app.register_blueprint(account_bp)
     app.register_blueprint(direct_request_bp)
     app.register_blueprint(group_bp)
+    app.register_blueprint(course_bp)
 
     return app

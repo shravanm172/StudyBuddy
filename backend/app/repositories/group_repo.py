@@ -8,7 +8,8 @@ class GroupRepo:
     
     @staticmethod
     def create_group(name: str, admin_uid: str, description: str = None, 
-                    is_visible: bool = True, privacy: GroupPrivacy = GroupPrivacy.PRIVATE) -> Optional[Dict[str, Any]]:
+                    is_visible: bool = True, privacy: GroupPrivacy = GroupPrivacy.PRIVATE,
+                    course_ids: List[str] = None) -> Optional[Dict[str, Any]]:
         """
         Create a new group with the specified admin.
         
@@ -18,6 +19,7 @@ class GroupRepo:
             description: Optional group description
             is_visible: Whether group is visible on group feed
             privacy: Group privacy setting (public/private)
+            course_ids: List of course IDs that this group studies
             
         Returns:
             Dictionary representation of created group, or None if creation failed
@@ -42,6 +44,17 @@ class GroupRepo:
             )
             
             db.session.add(admin_member)
+            
+            # Add courses to the group if provided
+            if course_ids:
+                from app.models.user import Course  # Import here to avoid circular imports
+                for course_id in course_ids:
+                    course = Course.query.get(course_id)
+                    if course:
+                        group.courses.append(course)
+                    else:
+                        print(f"Warning: Course {course_id} not found, skipping...")
+            
             db.session.commit()
             
             # Refresh to get all relationships
@@ -210,10 +223,77 @@ class GroupRepo:
             return False
     
     @staticmethod
-    def update_group_info(group_id: int, name: str = None, description: str = None, 
-                         is_visible: bool = None, privacy: GroupPrivacy = None) -> bool:
+    def kick_member(group_id: int, admin_uid: str, member_to_kick_uid: str) -> Dict[str, Any]:
         """
-        Update group information.
+        Admin kicks a member from the group.
+        
+        Args:
+            group_id: ID of the group
+            admin_uid: Firebase UID of the admin performing the kick
+            member_to_kick_uid: Firebase UID of the member to kick
+            
+        Returns:
+            Dict with success status and message
+        """
+        try:
+            # Verify the admin is actually an admin of this group
+            admin_member = GroupMember.query.filter_by(
+                group_id=group_id,
+                user_uid=admin_uid,
+                role=GroupRole.ADMIN
+            ).first()
+            
+            if not admin_member:
+                return {
+                    "success": False,
+                    "error": "You must be an admin to kick members"
+                }
+            
+            # Can't kick yourself
+            if admin_uid == member_to_kick_uid:
+                return {
+                    "success": False,
+                    "error": "You cannot kick yourself from the group"
+                }
+            
+            # Check if the member to kick exists in the group
+            member_to_kick = GroupMember.query.filter_by(
+                group_id=group_id,
+                user_uid=member_to_kick_uid
+            ).first()
+            
+            if not member_to_kick:
+                return {
+                    "success": False,
+                    "error": "User is not a member of this group"
+                }
+            
+            # Use the existing remove_member logic
+            success = GroupRepo.remove_member(group_id, member_to_kick_uid)
+            
+            if success:
+                return {
+                    "success": True,
+                    "message": "Member successfully removed from group"
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": "Failed to remove member from group"
+                }
+                
+        except Exception as e:
+            print(f"Error kicking member: {e}")
+            return {
+                "success": False,
+                "error": f"Database error: {str(e)}"
+            }
+    
+    @staticmethod
+    def update_group_info(group_id: int, name: str = None, description: str = None, 
+                         is_visible: bool = None, privacy: GroupPrivacy = None) -> Dict[str, Any]:
+        """
+        Update group information with validation.
         
         Args:
             group_id: ID of the group to update
@@ -223,13 +303,22 @@ class GroupRepo:
             privacy: New privacy setting (optional)
             
         Returns:
-            True if update was successful, False otherwise
+            Dict with success status and message/error
         """
         try:
             group = Group.query.get(group_id)
             if not group:
-                print(f"Group {group_id} not found")
-                return False
+                return {
+                    "success": False,
+                    "error": f"Group {group_id} not found"
+                }
+            
+            # VALIDATION: If trying to make group visible (public), ensure it has courses
+            if is_visible is True and len(group.courses) == 0:
+                return {
+                    "success": False,
+                    "error": "Cannot make group public without adding at least one course. Please add courses first."
+                }
             
             # Update provided fields
             if name is not None:
@@ -238,6 +327,24 @@ class GroupRepo:
                 group.description = description
             if is_visible is not None:
                 group.is_visible = is_visible
+            if privacy is not None:
+                group.privacy = privacy
+            
+            db.session.commit()
+            print(f"Group {group_id} updated successfully")
+            
+            return {
+                "success": True,
+                "message": "Group updated successfully"
+            }
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating group {group_id}: {e}")
+            return {
+                "success": False,
+                "error": f"Database error: {str(e)}"
+            }
             if privacy is not None:
                 group.privacy = privacy
             
@@ -344,3 +451,107 @@ class GroupRepo:
             db.session.rollback()
             print(f"Error deleting group {group_id}: {e}")
             return False
+    
+    @staticmethod
+    def add_course_to_group(group_id: int, course_id: str) -> bool:
+        """
+        Add a course to a group's study list.
+        
+        Args:
+            group_id: ID of the group
+            course_id: ID of the course to add
+            
+        Returns:
+            True if course was added successfully, False otherwise
+        """
+        try:
+            from app.models.user import Course
+            
+            group = Group.query.get(group_id)
+            course = Course.query.get(course_id)
+            
+            if not group or not course:
+                print(f"Group {group_id} or course {course_id} not found")
+                return False
+            
+            # Check if course is already in group
+            if course in group.courses:
+                print(f"Course {course_id} already in group {group_id}")
+                return True  # Not an error, just already exists
+            
+            group.courses.append(course)
+            db.session.commit()
+            
+            print(f"Added course {course_id} to group {group_id}")
+            return True
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error adding course to group: {e}")
+            return False
+    
+    @staticmethod
+    def remove_course_from_group(group_id: int, course_id: str) -> bool:
+        """
+        Remove a course from a group's study list.
+        
+        Args:
+            group_id: ID of the group
+            course_id: ID of the course to remove
+            
+        Returns:
+            True if course was removed successfully, False otherwise
+        """
+        try:
+            from app.models.user import Course
+            
+            group = Group.query.get(group_id)
+            course = Course.query.get(course_id)
+            
+            if not group or not course:
+                print(f"Group {group_id} or course {course_id} not found")
+                return False
+            
+            if course in group.courses:
+                group.courses.remove(course)
+                db.session.commit()
+                print(f"Removed course {course_id} from group {group_id}")
+            else:
+                print(f"Course {course_id} not in group {group_id}")
+            
+            return True
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error removing course from group: {e}")
+            return False
+    
+    @staticmethod
+    def get_groups_by_course(course_id: str) -> List[Dict[str, Any]]:
+        """
+        Get all visible groups that study a specific course.
+        
+        Args:
+            course_id: ID of the course
+            
+        Returns:
+            List of group dictionaries
+        """
+        try:
+            from app.models.user import Course
+            
+            course = Course.query.get(course_id)
+            if not course:
+                return []
+            
+            # Get all visible groups for this course
+            groups = Group.query.join(Group.courses).filter(
+                Course.course_id == course_id,
+                Group.is_visible == True
+            ).all()
+            
+            return [group.to_dict() for group in groups]
+            
+        except Exception as e:
+            print(f"Error getting groups by course: {e}")
+            return []

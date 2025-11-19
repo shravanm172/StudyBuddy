@@ -186,3 +186,263 @@ def get_user_groups():
     except Exception as e:
         print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/<int:group_id>/kick/", methods=["POST", "OPTIONS"])
+def kick_member(group_id):
+    """Admin kicks a member from the group"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    print(f"👢 === KICK MEMBER FROM GROUP {group_id} ===")
+    
+    # Get and verify Firebase token
+    auth_header = request.headers.get("Authorization", "")
+    print(f"🔑 Auth header present: {bool(auth_header)}")
+    
+    if not auth_header.startswith("Bearer "):
+        print("❌ Invalid authorization header format")
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    
+    token = auth_header.split(" ", 1)[1]
+    print(f"🎫 Extracted token length: {len(token)}")
+    
+    try:
+        from firebase_admin import auth as firebase_auth
+        print("🔍 Verifying Firebase token...")
+        decoded = firebase_auth.verify_id_token(token)
+        admin_uid = decoded.get("uid")
+        print(f"✅ Token verified! Admin UID: {admin_uid}")
+    except Exception as e:
+        print(f"❌ Token verification error: {e}")
+        return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
+
+    # Get request data
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No request data provided"}), 400
+        
+        member_to_kick_uid = data.get("member_uid")
+        if not member_to_kick_uid:
+            return jsonify({"error": "member_uid is required"}), 400
+            
+        print(f"👢 Admin {admin_uid} wants to kick {member_to_kick_uid} from group {group_id}")
+        
+    except Exception as e:
+        print(f"❌ Error parsing request data: {e}")
+        return jsonify({"error": "Invalid request data"}), 400
+
+    try:
+        # Perform the kick using GroupRepo
+        result = GroupRepo.kick_member(group_id, admin_uid, member_to_kick_uid)
+        
+        if result["success"]:
+            print(f"✅ {result['message']}")
+            return jsonify({
+                "success": True,
+                "message": result["message"]
+            }), 200
+        else:
+            print(f"❌ Kick failed: {result['error']}")
+            return jsonify({
+                "success": False,
+                "error": result["error"]
+            }), 400
+            
+    except Exception as e:
+        print(f"💥 Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/<int:group_id>/courses/", methods=["POST", "OPTIONS"])
+def add_course_to_group(group_id):
+    """Admin adds a course to the group's study list"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    print(f"📚 === ADD COURSE TO GROUP {group_id} ===")
+    
+    # Get and verify Firebase token
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    
+    token = auth_header.split(" ", 1)[1]
+    
+    try:
+        from firebase_admin import auth as firebase_auth
+        decoded = firebase_auth.verify_id_token(token)
+        admin_uid = decoded.get("uid")
+        print(f"✅ Token verified! Admin UID: {admin_uid}")
+    except Exception as e:
+        print(f"❌ Token verification error: {e}")
+        return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
+
+    # Get request data
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No request data provided"}), 400
+        
+        course_id = data.get("course_id")
+        if not course_id:
+            return jsonify({"error": "course_id is required"}), 400
+            
+        print(f"📚 Admin {admin_uid} wants to add course {course_id} to group {group_id}")
+        
+    except Exception as e:
+        print(f"❌ Error parsing request data: {e}")
+        return jsonify({"error": "Invalid request data"}), 400
+
+    try:
+        # Verify the user is an admin of this group
+        admin_member = GroupRepo.get_group_members(group_id)
+        is_admin = any(m['user_uid'] == admin_uid and m['role'] == 'admin' for m in admin_member)
+        
+        if not is_admin:
+            return jsonify({"error": "You must be an admin to manage group courses"}), 403
+        
+        # Add the course
+        success = GroupRepo.add_course_to_group(group_id, course_id)
+        
+        if success:
+            return jsonify({
+                "success": True,
+                "message": "Course added to group successfully"
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Failed to add course to group"
+            }), 400
+            
+    except Exception as e:
+        print(f"💥 Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/<int:group_id>/courses/<course_id>/", methods=["DELETE", "OPTIONS"])
+def remove_course_from_group(group_id, course_id):
+    """Admin removes a course from the group's study list"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    print(f"🗑️ === REMOVE COURSE {course_id} FROM GROUP {group_id} ===")
+    
+    # Get and verify Firebase token
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    
+    token = auth_header.split(" ", 1)[1]
+    
+    try:
+        from firebase_admin import auth as firebase_auth
+        decoded = firebase_auth.verify_id_token(token)
+        admin_uid = decoded.get("uid")
+        print(f"✅ Token verified! Admin UID: {admin_uid}")
+    except Exception as e:
+        print(f"❌ Token verification error: {e}")
+        return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
+
+    try:
+        # Verify the user is an admin of this group
+        admin_member = GroupRepo.get_group_members(group_id)
+        is_admin = any(m['user_uid'] == admin_uid and m['role'] == 'admin' for m in admin_member)
+        
+        if not is_admin:
+            return jsonify({"error": "You must be an admin to manage group courses"}), 403
+        
+        # Remove the course
+        success = GroupRepo.remove_course_from_group(group_id, course_id)
+        
+        if success:
+            return jsonify({
+                "success": True,
+                "message": "Course removed from group successfully"
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Failed to remove course from group"
+            }), 400
+            
+    except Exception as e:
+        print(f"💥 Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/<int:group_id>/visibility/", methods=["PUT", "OPTIONS"])
+def toggle_group_visibility(group_id):
+    """Admin toggles group visibility (with course validation)"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    print(f"👁️ === TOGGLE GROUP {group_id} VISIBILITY ===")
+    
+    # Get and verify Firebase token
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    
+    token = auth_header.split(" ", 1)[1]
+    
+    try:
+        from firebase_admin import auth as firebase_auth
+        decoded = firebase_auth.verify_id_token(token)
+        admin_uid = decoded.get("uid")
+        print(f"✅ Token verified! Admin UID: {admin_uid}")
+    except Exception as e:
+        print(f"❌ Token verification error: {e}")
+        return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
+
+    # Get request data
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No request data provided"}), 400
+        
+        is_visible = data.get("is_visible")
+        if is_visible is None:
+            return jsonify({"error": "is_visible is required"}), 400
+            
+        print(f"👁️ Admin {admin_uid} wants to set group {group_id} visibility to {is_visible}")
+        
+    except Exception as e:
+        print(f"❌ Error parsing request data: {e}")
+        return jsonify({"error": "Invalid request data"}), 400
+
+    try:
+        # Verify the user is an admin of this group
+        admin_member = GroupRepo.get_group_members(group_id)
+        is_admin = any(m['user_uid'] == admin_uid and m['role'] == 'admin' for m in admin_member)
+        
+        if not is_admin:
+            return jsonify({"error": "You must be an admin to change group visibility"}), 403
+        
+        # Update the group visibility with validation
+        result = GroupRepo.update_group_info(group_id, is_visible=is_visible)
+        
+        if result["success"]:
+            return jsonify({
+                "success": True,
+                "message": result["message"]
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": result["error"]
+            }), 400
+            
+    except Exception as e:
+        print(f"💥 Database error: {e}")
+        return jsonify({"error": str(e)}), 500

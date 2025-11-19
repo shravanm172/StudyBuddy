@@ -3,6 +3,13 @@ from datetime import datetime
 from enum import Enum
 from app import db
 
+# Association table for many-to-many relationship between groups and courses
+group_courses = db.Table('group_courses',
+    db.Column('group_id', db.Integer, db.ForeignKey('groups.id'), primary_key=True),
+    db.Column('course_id', db.String, db.ForeignKey('courses.course_id'), primary_key=True),
+    db.Column('created_at', db.DateTime, default=datetime.utcnow)
+)
+
 class GroupRole(Enum):
     ADMIN = "admin"
     MEMBER = "member"
@@ -28,6 +35,8 @@ class Group(db.Model):
     
     # Relationships
     members = db.relationship('GroupMember', back_populates='group', cascade='all, delete-orphan')
+    courses = db.relationship('Course', secondary=group_courses, lazy='subquery',
+                             backref=db.backref('groups', lazy=True))
     
     def __repr__(self):
         return f'<Group {self.id}: {self.name}>'
@@ -41,7 +50,8 @@ class Group(db.Model):
             'privacy': self.privacy.value,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
-            'member_count': len(self.members)
+            'member_count': len(self.members),
+            'courses': [{'course_id': course.course_id, 'title': course.title} for course in self.courses]
         }
 
 
