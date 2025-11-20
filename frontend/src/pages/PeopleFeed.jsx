@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import ProfileCard from "../components/ProfileCard";
-import { rankUsers } from "../utils/rankingEngine";
+import { rankUsers } from "../utils/peopleRankingEngine";
 
 export default function PeopleFeed() {
   const { user } = useAuth();
@@ -179,23 +179,27 @@ export default function PeopleFeed() {
 
       if (sharedMembershipsRes.ok) {
         const sharedMembershipsData = await sharedMembershipsRes.json();
-        const usersInGroupsWith = new Set(sharedMembershipsData.shared_memberships || []);
+        const usersInGroupsWith = new Set(
+          sharedMembershipsData.shared_memberships || []
+        );
 
         // Update request states: only keep "accepted" status if still in groups together
         setRequestStates((prev) => {
           const newStates = { ...prev };
-          
+
           // For each user with "accepted" status, check if we're still in groups together
           Object.keys(newStates).forEach((userUid) => {
             if (newStates[userUid] === "accepted") {
               // If we're no longer in any groups together, reset to null (show "Send Request")
               if (!usersInGroupsWith.has(userUid)) {
                 delete newStates[userUid]; // Remove the status entirely
-                console.log(`🔄 Reset status for ${userUid}: no longer in groups together`);
+                console.log(
+                  `🔄 Reset status for ${userUid}: no longer in groups together`
+                );
               }
             }
           });
-          
+
           return newStates;
         });
       }

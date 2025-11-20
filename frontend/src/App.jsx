@@ -9,6 +9,7 @@ import PeopleFeed from "./pages/PeopleFeed";
 import RequestsPage from "./pages/RequestsPage";
 import MyGroupsPage from "./pages/MyGroupsPage";
 import GroupViewPage from "./pages/GroupViewPage";
+import GroupFeedPage from "./pages/GroupFeedPage";
 
 export default function App() {
   return (
@@ -66,6 +67,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <GroupViewPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/group-feed"
+          element={
+            <ProtectedRoute>
+              <GroupFeedPage />
             </ProtectedRoute>
           }
         />

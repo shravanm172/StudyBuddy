@@ -69,9 +69,11 @@ export default function Landing() {
         My Requests
       </button>
 
-      <button onClick={() => navigate("/groups")}>
+      <button onClick={() => navigate("/groups")} style={{ marginRight: 16 }}>
         My Groups
       </button>
+
+      <button onClick={() => navigate("/group-feed")}>Find Groups</button>
 
       {testError && (
         <p style={{ color: "red", marginTop: 16 }}>

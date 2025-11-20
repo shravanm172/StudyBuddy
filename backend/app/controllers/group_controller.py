@@ -446,3 +446,85 @@ def toggle_group_visibility(group_id):
     except Exception as e:
         print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/feed/", methods=["GET", "OPTIONS"])
+def get_group_feed():
+    """Get recommended groups for the user based on course overlap"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    print("🔍 === GET GROUP FEED ===")
+    
+    # Get and verify Firebase token
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    
+    token = auth_header.split(" ", 1)[1]
+    
+    try:
+        from firebase_admin import auth as firebase_auth
+        decoded = firebase_auth.verify_id_token(token)
+        user_uid = decoded.get("uid")
+        print(f"✅ Token verified! User UID: {user_uid}")
+    except Exception as e:
+        print(f"❌ Token verification error: {e}")
+        return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
+
+    try:
+        print(f"📚 Getting recommended groups for user {user_uid}...")
+        result = GroupRepo.get_recommended_groups_for_user(user_uid)
+        
+        # Extract data from the new format
+        user_courses = result.get("user_courses", [])
+        groups = result.get("groups", [])
+        
+        print(f"✅ Found {len(groups)} recommended groups for user courses: {user_courses}")
+        return jsonify({
+            "user_courses": user_courses,
+            "groups": groups
+        }), 200
+        
+    except Exception as e:
+        print(f"💥 Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/debug/all-visible/", methods=["GET", "OPTIONS"])
+def debug_all_visible_groups():
+    """Debug endpoint to see all visible groups in the system"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    try:
+        from app.models.group import Group
+        
+        visible_groups = Group.query.filter_by(is_visible=True).all()
+        
+        groups_data = []
+        for group in visible_groups:
+            groups_data.append({
+                'id': group.id,
+                'name': group.name,
+                'is_visible': group.is_visible,
+                'privacy': group.privacy.value,
+                'course_count': len(group.courses),
+                'member_count': len(group.members),
+                'courses': [c.course_id for c in group.courses],
+                'created_at': group.created_at.isoformat()
+            })
+        
+        return jsonify({
+            "success": True,
+            "visible_groups": groups_data,
+            "total_visible": len(groups_data)
+        }), 200
+        
+    except Exception as e:
+        print(f"💥 Debug error: {e}")
+        return jsonify({"error": str(e)}), 500

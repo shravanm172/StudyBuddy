@@ -555,3 +555,85 @@ class GroupRepo:
         except Exception as e:
             print(f"Error getting groups by course: {e}")
             return []
+    
+    @staticmethod
+    def get_recommended_groups_for_user(user_uid: str) -> List[Dict[str, Any]]:
+        """
+        Get visible groups that study courses the user is enrolled in.
+        Excludes groups the user is already a member of.
+        Returns groups with overlap information but NO ranking (ranking done in frontend).
+        
+        Args:
+            user_uid: Firebase UID of the user
+            
+        Returns:
+            List of group dictionaries with course overlap info and user courses (unranked)
+        """
+        try:
+            from app.models.user import UserCourse, Course
+            from app.repositories.user_repo import UserRepo
+            
+            # Get user's profile including courses
+            user_data = UserRepo.get_user(user_uid)
+            if not user_data:
+                print(f"Debug: User {user_uid} not found")
+                return []
+            
+            user_course_ids = user_data.get('courses', [])
+            print(f"Debug: User {user_uid} is enrolled in courses: {user_course_ids}")
+            
+            if not user_course_ids:
+                print(f"Debug: User {user_uid} has no course enrollments")
+                return []
+            
+            # Get user's current group memberships to exclude them
+            user_groups = GroupMember.query.filter_by(user_uid=user_uid).all()
+            user_group_ids = [ug.group_id for ug in user_groups]
+            
+            # Find visible groups that study any of the user's courses
+            query = Group.query.join(Group.courses).filter(
+                Course.course_id.in_(user_course_ids),
+                Group.is_visible == True
+            )
+            
+            # Exclude groups user is already in
+            if user_group_ids:
+                query = query.filter(~Group.id.in_(user_group_ids))
+            
+            # Return groups in creation order (newest first) - no ranking here
+            groups = query.distinct().order_by(Group.created_at.desc()).all()
+            
+            print(f"Debug: Found {len(groups)} visible groups for user courses: {user_course_ids}")
+            print(f"Debug: User is already in groups: {user_group_ids}")
+            for group in groups:
+                print(f"Debug: Group {group.id} ({group.name}) - visible: {group.is_visible}, privacy: {group.privacy}")
+            
+            # Add course overlap information and user courses for frontend ranking
+            groups_with_overlap = []
+            for group in groups:
+                group_dict = group.to_dict()
+                
+                # Find which of the user's courses overlap with this group
+                group_course_ids = [course.course_id for course in group.courses]
+                overlapping_courses = [
+                    course_id for course_id in user_course_ids 
+                    if course_id in group_course_ids
+                ]
+                
+                group_dict['overlapping_courses'] = overlapping_courses
+                group_dict['overlap_count'] = len(overlapping_courses)
+                
+                groups_with_overlap.append(group_dict)
+            
+            # Include user courses in response for frontend ranking
+            result = {
+                "user_courses": user_course_ids,
+                "groups": groups_with_overlap
+            }
+            
+            print(f"Returning {len(groups_with_overlap)} groups with overlap info (unranked)")
+            return result
+            
+        except Exception as e:
+            print(f"Error getting recommended groups for user: {e}")
+            return {"user_courses": [], "groups": []}

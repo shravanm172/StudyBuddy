@@ -34,11 +34,14 @@ export default function MyGroupsPage() {
       setLoading(true);
       const token = await user.getIdToken();
 
-      const response = await fetch("http://localhost:5000/api/groups/user-groups/", {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/groups/user-groups/",
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -70,9 +73,19 @@ export default function MyGroupsPage() {
     };
 
     if (role === "admin") {
-      return { ...baseStyle, backgroundColor: "#fff3cd", color: "#856404", border: "1px solid #ffeaa7" };
+      return {
+        ...baseStyle,
+        backgroundColor: "#fff3cd",
+        color: "#856404",
+        border: "1px solid #ffeaa7",
+      };
     } else {
-      return { ...baseStyle, backgroundColor: "#d1edff", color: "#0c5460", border: "1px solid #bee5eb" };
+      return {
+        ...baseStyle,
+        backgroundColor: "#d1edff",
+        color: "#0c5460",
+        border: "1px solid #bee5eb",
+      };
     }
   };
 
@@ -93,7 +106,7 @@ export default function MyGroupsPage() {
     if (diffDays === 1) return "Today";
     if (diffDays === 2) return "Yesterday";
     if (diffDays <= 7) return `${diffDays - 1} days ago`;
-    
+
     return date.toLocaleDateString();
   };
 
@@ -133,7 +146,8 @@ export default function MyGroupsPage() {
         <div style={styles.emptyState}>
           <h2>No groups yet</h2>
           <p>
-            You haven't joined any study groups yet. Start by connecting with study buddies!
+            You haven't joined any study groups yet. Start by connecting with
+            study buddies!
           </p>
           <button
             style={styles.primaryButton}
@@ -163,15 +177,14 @@ export default function MyGroupsPage() {
                   </div>
                   <div style={styles.groupMeta}>
                     <span style={styles.memberCount}>
-                      👥 {group.member_count} member{group.member_count !== 1 ? "s" : ""}
+                      👥 {group.member_count} member
+                      {group.member_count !== 1 ? "s" : ""}
                     </span>
                   </div>
                 </div>
 
                 {group.description && (
-                  <div style={styles.groupDescription}>
-                    {group.description}
-                  </div>
+                  <div style={styles.groupDescription}>{group.description}</div>
                 )}
 
                 <div style={styles.groupInfo}>
@@ -179,7 +192,8 @@ export default function MyGroupsPage() {
                     <strong>Privacy:</strong> {getPrivacyText(group.privacy)}
                   </div>
                   <div style={styles.groupDetail}>
-                    <strong>Visibility:</strong> {getVisibilityText(group.is_visible)}
+                    <strong>Visibility:</strong>{" "}
+                    {getVisibilityText(group.is_visible)}
                   </div>
                   <div style={styles.groupDetail}>
                     <strong>Joined:</strong> {formatDate(group.joined_at)}

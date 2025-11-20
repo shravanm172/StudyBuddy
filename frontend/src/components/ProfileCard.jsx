@@ -1,5 +1,5 @@
 // src/components/ProfileCard.jsx
-import { formatGrade, formatGender } from "../utils/rankingEngine";
+import { formatGrade, formatGender } from "../utils/peopleRankingEngine";
 
 export default function ProfileCard({
   user,
@@ -19,7 +19,9 @@ export default function ProfileCard({
       onSendRequest &&
       !isLoadingRequest &&
       !incomingRequestId &&
-      (!requestStatus || requestStatus === "rejected" || requestStatus === "accepted")
+      (!requestStatus ||
+        requestStatus === "rejected" ||
+        requestStatus === "accepted")
     ) {
       onSendRequest(user);
     }
@@ -119,7 +121,7 @@ export default function ProfileCard({
         onClick={handleSendRequest}
         disabled={
           isLoadingRequest ||
-          (requestStatus === "pending") || // Only disable for pending requests
+          requestStatus === "pending" || // Only disable for pending requests
           incomingRequestId
         }
       >

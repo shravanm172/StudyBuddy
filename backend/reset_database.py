@@ -1,57 +1,49 @@
 # backend/reset_database.py
 """
-Database Reset & Reseed Script
-- Clears all user data (users, profiles, enrollments)
-- Keeps courses table intact and reseeds it
-- Perfect for testing clean state
+Database Reset Script
+- Clears all direct request and group data
+- Keeps all user data (users, profiles, enrollments)
+- Keeps all existing courses intact
+- Perfect for testing clean state while preserving users and their course data
 """
 
 from app import create_app, db
 from app.models.user import User, UserProfile, UserCourse, Course
+from app.models.direct_request import DirectRequest
+from app.models.group import Group, GroupMember
 
-# Course data to seed
-COURSES = [
-    ("CSE1001", "Intro to Programming"),
-    ("CSE2010", "Data Structures"), 
-    ("CSE3002", "Algorithms"),
-    ("CSE4001", "Software Engineering"),
-    ("PHY2002", "Physics II"),
-]
-
-def reset_and_reseed():
-    """Clear user data and reseed courses"""
+def reset_groups_and_requests():
+    """Clear direct request and group data, preserve user data and courses"""
     app = create_app()
     with app.app_context():
         
-        print("🗑️  Clearing user data...")
+        print("🗑️  Clearing direct request and group data...")
         
         try:
-            # Clear user-related tables (in correct order due to foreign keys)
-            UserCourse.query.delete()
-            print("   ✅ Cleared user_courses")
+            # Clear direct request data
+            DirectRequest.query.delete()
+            print("   ✅ Cleared direct_requests")
             
-            UserProfile.query.delete() 
-            print("   ✅ Cleared user_profiles")
+            # Clear group data (in correct order due to foreign keys)
+            GroupMember.query.delete()
+            print("   ✅ Cleared group_members")
             
-            User.query.delete()
-            print("   ✅ Cleared users")
-            
-            # Clear and reseed courses
-            Course.query.delete()
-            print("   ✅ Cleared courses")
-            
-            print("\n🌱 Reseeding courses...")
-            for course_id, title in COURSES:
-                course = Course(course_id=course_id, title=title)
-                db.session.add(course)
-                print(f"   ➕ Added: {course_id} - {title}")
+            Group.query.delete()
+            print("   ✅ Cleared groups (and group_courses association table)")
             
             # Commit all changes
             db.session.commit()
             
+            # Count existing data for summary
+            user_count = User.query.count()
+            course_count = Course.query.count()
+            user_course_count = UserCourse.query.count()
+            
             print(f"\n🎉 Database reset complete!")
-            print(f"   📊 {len(COURSES)} courses seeded")
-            print(f"   🧹 All user data cleared")
+            print(f"   🧹 All direct request and group data cleared")
+            print(f"   � {user_count} users preserved")
+            print(f"   📚 {course_count} courses preserved")
+            print(f"   🎓 {user_course_count} user course enrollments preserved")
             print(f"   ✨ Ready for fresh testing!")
             
         except Exception as e:
@@ -60,4 +52,4 @@ def reset_and_reseed():
             raise
 
 if __name__ == "__main__":
-    reset_and_reseed()
+    reset_groups_and_requests()

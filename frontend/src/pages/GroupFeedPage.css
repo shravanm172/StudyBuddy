@@ -1,0 +1,261 @@
+/* GroupFeedPage.css */
+
+.group-feed-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.group-feed-loading-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.group-feed-error-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.group-feed-error {
+  color: red;
+  margin-top: 8px;
+}
+
+.group-feed-header {
+  margin-bottom: 30px;
+  padding: 20px 0;
+}
+
+.group-feed-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+}
+
+.group-feed-header-text {
+  text-align: left;
+  flex: 1;
+}
+
+.group-feed-refresh-button {
+  padding: 10px 20px;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-width: 120px;
+}
+
+.group-feed-refresh-button:hover {
+  background-color: #0056b3;
+}
+
+.group-feed-refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.group-feed-title {
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.group-feed-subtitle {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+.group-feed-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.group-feed-create-group-button {
+  padding: 12px 24px;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.2s ease;
+}
+
+.group-feed-create-group-button:hover {
+  background-color: #0056b3;
+}
+
+.group-feed-groups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.group-feed-group-card {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.group-feed-group-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border-color: #007acc;
+}
+
+.group-feed-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.group-feed-group-title-section {
+  flex: 1;
+}
+
+.group-feed-group-name {
+  font-size: 20px;
+  color: #333;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.group-feed-badges {
+  display: flex;
+  align-items: center;
+}
+
+.group-feed-join-button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-feed-join-button:hover {
+  background-color: #218838;
+}
+
+.group-feed-group-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.group-feed-courses-section {
+  margin-bottom: 16px;
+}
+
+.group-feed-courses-title {
+  font-size: 14px;
+  color: #333;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.group-feed-courses-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.group-feed-course-tag {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.group-feed-overlapping-course-tag {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.group-feed-non-overlapping-course-tag {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #e0e0e0;
+}
+
+.group-feed-group-info {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #888;
+  flex-wrap: wrap;
+}
+
+.group-feed-group-info-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Overlap badge styles */
+.group-feed-overlap-badge-high {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.group-feed-overlap-badge-medium {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.group-feed-overlap-badge-low {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Ranking score badge */
+.group-feed-ranking-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
