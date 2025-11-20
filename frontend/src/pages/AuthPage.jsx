@@ -10,20 +10,17 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // NEW: username field
   const [username, setUsername] = useState("");
-
-  // UPDATED: use date_of_birth instead of age, remove school
   const [dateOfBirth, setDateOfBirth] = useState(""); // "YYYY-MM-DD"
   const [grade, setGrade] = useState("");
   const [gender, setGender] = useState("");
   const [courses, setCourses] = useState([]); // array of strings/ids
 
-  // NEW: dynamic enums from backend
+  // dynamic enums from backend
   const [enums, setEnums] = useState({ grades: [], genders: [] });
   const [enumsLoading, setEnumsLoading] = useState(false);
 
-  // NEW: username validation
+  // username validation
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [usernameChecking, setUsernameChecking] = useState(false);
 
@@ -36,7 +33,7 @@ export default function AuthPage() {
     if (user) nav("/landing", { replace: true });
   }, [user, nav]);
 
-  // NEW: Load enums from backend
+  // Load enums from backend
   useEffect(() => {
     async function loadEnums() {
       if (mode !== "signup") return;
@@ -60,7 +57,7 @@ export default function AuthPage() {
     loadEnums();
   }, [mode]);
 
-  // NEW: Check username availability
+  // check username availability
   const checkUsername = async (username) => {
     if (!username || username.length < 3) {
       setUsernameAvailable(null);
@@ -86,7 +83,7 @@ export default function AuthPage() {
     }
   };
 
-  // NEW: Debounced username check
+  // Debounced username check
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (mode === "signup" && username) {
@@ -119,7 +116,7 @@ export default function AuthPage() {
         await login(email, password);
         // useEffect will redirect once user is set
       } else {
-        // ✅ Validation: username, dateOfBirth, grade, gender required
+        // Validation: username, dateOfBirth, grade, gender required
         if (!username || !dateOfBirth || !grade || !gender) {
           throw new Error("Please complete all required fields.");
         }
@@ -136,7 +133,7 @@ export default function AuthPage() {
           throw new Error("Password must be at least 6 characters.");
         }
 
-        // ✅ Payload matches backend schema: username, date_of_birth, grade, gender, courses
+        // Payload matches backend schema: username, date_of_birth, grade, gender, courses
         await signup(email, password, {
           username,
           date_of_birth: dateOfBirth, // "YYYY-MM-DD"
@@ -179,7 +176,6 @@ export default function AuthPage() {
 
         {mode === "signup" && (
           <>
-            {/* NEW: Username field with availability check */}
             <div className="username-input-container">
               <input
                 className={`auth-input username-input-with-validation ${
@@ -210,7 +206,6 @@ export default function AuthPage() {
               )}
             </div>
 
-            {/* ✅ DOB instead of age */}
             <input
               className="auth-input"
               type="date"
@@ -221,7 +216,6 @@ export default function AuthPage() {
               disabled={submitting}
             />
 
-            {/* UPDATED: Dynamic grade dropdown */}
             <select
               className="auth-input"
               value={grade}
@@ -239,7 +233,6 @@ export default function AuthPage() {
               ))}
             </select>
 
-            {/* UPDATED: Dynamic gender dropdown */}
             <select
               className="auth-input"
               value={gender}

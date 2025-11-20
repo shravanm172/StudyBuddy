@@ -615,3 +615,57 @@ def debug_all_visible_groups():
     except Exception as e:
         print(f"💥 Debug error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@bp.route("/<int:group_id>/chat/access/", methods=["GET", "OPTIONS"])
+def check_chat_access(group_id):
+    """Check if the current user has access to this group's chat"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    print(f"💬 === CHECK CHAT ACCESS FOR GROUP {group_id} ===")
+    
+    # Get and verify Firebase token
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    
+    token = auth_header.split(" ", 1)[1]
+    
+    try:
+        from firebase_admin import auth as firebase_auth
+        decoded = firebase_auth.verify_id_token(token)
+        user_uid = decoded.get("uid")
+        print(f"✅ Token verified! User UID: {user_uid}")
+    except Exception as e:
+        print(f"❌ Token verification error: {e}")
+        return jsonify({"error": "Invalid or expired Firebase token"}), 401
+    
+    try:
+        # Simply check if user is a member of the group
+        from app.models.group import GroupMember
+        
+        member = GroupMember.query.filter_by(
+            group_id=group_id,
+            user_uid=user_uid
+        ).first()
+        
+        if member:
+            print(f"✅ User {user_uid} has access to group {group_id} chat")
+            return jsonify({
+                "has_access": True,
+                "role": member.role.value,
+                "message": "Chat access granted"
+            }), 200
+        else:
+            print(f"❌ User {user_uid} is not a member of group {group_id}")
+            return jsonify({
+                "has_access": False,
+                "message": "You must be a group member to access the chat"
+            }), 403
+            
+    except Exception as e:
+        print(f"💥 Database error: {e}")
+        return jsonify({"error": "Failed to check chat access"}), 500

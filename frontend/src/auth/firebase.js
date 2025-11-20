@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth"; 
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBQPxETsXYLyK0qCMOMx9_NW4Xhjz0PMI0",
   authDomain: "studybuddy-5a6b8.firebaseapp.com",
@@ -17,4 +19,5 @@ console.log("ENV loaded?", {
 });
 
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 export default app;

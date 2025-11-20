@@ -822,3 +822,24 @@
     align-self: flex-end;
   }
 }
+
+/* Chat Section Styles */
+.group-view-chat-section {
+  margin-top: 32px;
+}
+
+.group-view-chat-container {
+  margin-top: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive chat styles */
+@media (max-width: 768px) {
+  .group-view-chat-container {
+    margin-top: 16px;
+    border-radius: 8px;
+  }
+}

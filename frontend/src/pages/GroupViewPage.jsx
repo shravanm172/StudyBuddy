@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate, useParams } from "react-router-dom";
+import GroupChat from "../components/GroupChat";
 import "./GroupViewPage.css";
 
 function GroupViewPage() {
@@ -30,6 +31,9 @@ function GroupViewPage() {
   const [editingDescription, setEditingDescription] = useState(false);
   const [editedDescription, setEditedDescription] = useState("");
   const [savingDescription, setSavingDescription] = useState(false);
+
+  // Group chat state
+  const [showChatSection, setShowChatSection] = useState(false);
 
   // Load group details and members
   useEffect(() => {
@@ -1116,6 +1120,25 @@ function GroupViewPage() {
             )}
           </div>
         )}
+
+        {/* Group Chat Section */}
+        <div className="group-view-chat-section">
+          <div className="group-view-section-header">
+            <h2 className="group-view-section-title">Group Chat</h2>
+            <button
+              className="group-view-toggle-button"
+              onClick={() => setShowChatSection(!showChatSection)}
+            >
+              {showChatSection ? "Hide Chat" : "Open Chat"}
+            </button>
+          </div>
+
+          {showChatSection && (
+            <div className="group-view-chat-container">
+              <GroupChat groupId={groupId} groupMembers={members} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
