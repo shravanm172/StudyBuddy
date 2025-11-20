@@ -17,11 +17,19 @@ export default function GroupViewPage() {
   const [showCourseForm, setShowCourseForm] = useState(false);
   const [availableCourses, setAvailableCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState("");
-  
+
   // Group join request management
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
   const [showRequestsSection, setShowRequestsSection] = useState(false);
+
+  // Group editing state
+  const [editingName, setEditingName] = useState(false);
+  const [editedName, setEditedName] = useState("");
+  const [savingName, setSavingName] = useState(false);
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [editedDescription, setEditedDescription] = useState("");
+  const [savingDescription, setSavingDescription] = useState(false);
 
   // Load group details and members
   useEffect(() => {
@@ -40,7 +48,11 @@ export default function GroupViewPage() {
 
   // Load pending requests when user becomes admin and requests section is open
   useEffect(() => {
-    if (currentUserRole === "admin" && showRequestsSection && !loadingRequests) {
+    if (
+      currentUserRole === "admin" &&
+      showRequestsSection &&
+      !loadingRequests
+    ) {
       loadPendingRequests();
     }
   }, [currentUserRole, showRequestsSection]);
@@ -409,10 +421,12 @@ export default function GroupViewPage() {
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
-        
+
         // Remove the request from the pending list
-        setPendingRequests(prev => prev.filter(req => req.id !== requestId));
-        
+        setPendingRequests((prev) =>
+          prev.filter((req) => req.id !== requestId)
+        );
+
         // If accepted, refresh the group data to show new member
         if (accept) {
           await refreshGroupData();
@@ -427,6 +441,132 @@ export default function GroupViewPage() {
       alert("Failed to respond to request. Please try again.");
     } finally {
       setLoadingAction("");
+    }
+  };
+
+  // Group name editing functions
+  const startEditingName = () => {
+    setEditedName(group.name);
+    setEditingName(true);
+  };
+
+  const cancelEditingName = () => {
+    setEditingName(false);
+    setEditedName("");
+  };
+
+  const saveGroupName = async () => {
+    if (!user || !groupId || currentUserRole !== "admin") return;
+
+    const trimmedName = editedName.trim();
+    if (!trimmedName) {
+      alert("Group name cannot be empty");
+      return;
+    }
+
+    if (trimmedName === group.name) {
+      // No change, just cancel editing
+      cancelEditingName();
+      return;
+    }
+
+    try {
+      setSavingName(true);
+      const token = await user.getIdToken();
+
+      const response = await fetch(
+        `http://localhost:5000/api/groups/${groupId}/info/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({ name: trimmedName }),
+        }
+      );
+
+      if (response.ok) {
+        console.log("✅ Group name updated successfully");
+
+        // Update local state
+        setGroup((prev) => ({ ...prev, name: trimmedName }));
+        setEditingName(false);
+        setEditedName("");
+
+        // Show success message
+        alert("Group name updated successfully!");
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to update group name:", errorData);
+        alert(errorData.error || "Failed to update group name");
+      }
+    } catch (err) {
+      console.error("Error updating group name:", err);
+      alert("Failed to update group name. Please try again.");
+    } finally {
+      setSavingName(false);
+    }
+  };
+
+  // Group description editing functions
+  const startEditingDescription = () => {
+    setEditedDescription(group.description || "");
+    setEditingDescription(true);
+  };
+
+  const cancelEditingDescription = () => {
+    setEditingDescription(false);
+    setEditedDescription("");
+  };
+
+  const saveGroupDescription = async () => {
+    if (!user || !groupId || currentUserRole !== "admin") return;
+
+    const trimmedDescription = editedDescription.trim();
+
+    if (trimmedDescription === (group.description || "")) {
+      // No change, just cancel editing
+      cancelEditingDescription();
+      return;
+    }
+
+    try {
+      setSavingDescription(true);
+      const token = await user.getIdToken();
+
+      const response = await fetch(
+        `http://localhost:5000/api/groups/${groupId}/info/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({ description: trimmedDescription }),
+        }
+      );
+
+      if (response.ok) {
+        console.log("✅ Group description updated successfully");
+
+        // Update local state
+        setGroup((prev) => ({ ...prev, description: trimmedDescription }));
+        setEditingDescription(false);
+        setEditedDescription("");
+
+        // Show success message
+        alert("Group description updated successfully!");
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to update group description:", errorData);
+        alert(errorData.error || "Failed to update group description");
+      }
+    } catch (err) {
+      console.error("Error updating group description:", err);
+      alert("Failed to update group description. Please try again.");
+    } finally {
+      setSavingDescription(false);
     }
   };
 
@@ -516,14 +656,101 @@ export default function GroupViewPage() {
 
         <div style={styles.groupHeader}>
           <div style={styles.groupTitleSection}>
-            <h1 style={styles.groupTitle}>{group.name}</h1>
+            {editingName ? (
+              <div style={styles.editNameContainer}>
+                <input
+                  type="text"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  style={styles.editNameInput}
+                  placeholder="Enter group name"
+                  maxLength={100}
+                  disabled={savingName}
+                />
+                <div style={styles.editNameActions}>
+                  <button
+                    onClick={saveGroupName}
+                    disabled={savingName || !editedName.trim()}
+                    style={styles.saveNameButton}
+                  >
+                    {savingName ? "Saving..." : "Save"}
+                  </button>
+                  <button
+                    onClick={cancelEditingName}
+                    disabled={savingName}
+                    style={styles.cancelNameButton}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={styles.titleWithEdit}>
+                <h1 style={styles.groupTitle}>{group.name}</h1>
+                {currentUserRole === "admin" && (
+                  <button
+                    onClick={startEditingName}
+                    style={styles.editNameButton}
+                    title="Edit group name"
+                  >
+                    ✏️
+                  </button>
+                )}
+              </div>
+            )}
             <span style={getRoleBadgeStyle(currentUserRole)}>
               {currentUserRole}
             </span>
           </div>
 
-          {group.description && (
-            <div style={styles.groupDescription}>{group.description}</div>
+          {/* Group Description Section */}
+          {editingDescription ? (
+            <div style={styles.editDescriptionContainer}>
+              <textarea
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                style={styles.editDescriptionInput}
+                placeholder="Enter group description (optional)"
+                maxLength={500}
+                disabled={savingDescription}
+                rows={3}
+              />
+              <div style={styles.editDescriptionActions}>
+                <button
+                  onClick={saveGroupDescription}
+                  disabled={savingDescription}
+                  style={styles.saveDescriptionButton}
+                >
+                  {savingDescription ? "Saving..." : "Save"}
+                </button>
+                <button
+                  onClick={cancelEditingDescription}
+                  disabled={savingDescription}
+                  style={styles.cancelDescriptionButton}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={styles.descriptionWithEdit}>
+              {group.description ? (
+                <div style={styles.groupDescription}>{group.description}</div>
+              ) : (
+                currentUserRole === "admin" && (
+                  <div style={styles.noDescription}>No description set</div>
+                )
+              )}
+              {currentUserRole === "admin" && (
+                <button
+                  onClick={startEditingDescription}
+                  style={styles.editDescriptionButton}
+                  title="Edit group description"
+                >
+                  ✏️
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -778,12 +1005,11 @@ export default function GroupViewPage() {
                   }}
                   disabled={loadingRequests}
                 >
-                  {loadingRequests 
-                    ? "Loading..." 
-                    : showRequestsSection 
-                      ? "Hide Requests" 
-                      : "Manage Requests"
-                  }
+                  {loadingRequests
+                    ? "Loading..."
+                    : showRequestsSection
+                    ? "Hide Requests"
+                    : "Manage Requests"}
                 </button>
               </div>
             </div>
@@ -794,15 +1020,20 @@ export default function GroupViewPage() {
                   <p style={styles.loadingText}>Loading pending requests...</p>
                 ) : pendingRequests.length === 0 ? (
                   <p style={styles.emptyText}>
-                    No pending join requests. When users request to join your private group, they'll appear here.
+                    No pending join requests. When users request to join your
+                    private group, they'll appear here.
                   </p>
                 ) : (
                   <div style={styles.requestsList}>
                     {pendingRequests.map((request) => {
                       const profile = request.requester_profile || {};
-                      const username = profile.username || `User_${request.requester_uid?.substring(0, 8) || 'Unknown'}`;
+                      const username =
+                        profile.username ||
+                        `User_${
+                          request.requester_uid?.substring(0, 8) || "Unknown"
+                        }`;
                       const avatarLetter = username.charAt(0).toUpperCase();
-                      
+
                       return (
                         <div key={request.id} style={styles.requestCard}>
                           <div style={styles.requestInfo}>
@@ -810,21 +1041,21 @@ export default function GroupViewPage() {
                               {avatarLetter}
                             </div>
                             <div style={styles.requestDetails}>
-                              <h4 style={styles.requesterName}>
-                                {username}
-                              </h4>
+                              <h4 style={styles.requesterName}>{username}</h4>
                               <div style={styles.profileInfo}>
                                 {profile.grade && (
                                   <span style={styles.profileBadge}>
                                     {profile.grade}
                                   </span>
                                 )}
-                                {profile.courses && profile.courses.length > 0 && (
-                                  <span style={styles.profileBadge}>
-                                    {profile.courses.slice(0, 2).join(', ')}
-                                    {profile.courses.length > 2 && ` +${profile.courses.length - 2} more`}
-                                  </span>
-                                )}
+                                {profile.courses &&
+                                  profile.courses.length > 0 && (
+                                    <span style={styles.profileBadge}>
+                                      {profile.courses.slice(0, 2).join(", ")}
+                                      {profile.courses.length > 2 &&
+                                        ` +${profile.courses.length - 2} more`}
+                                    </span>
+                                  )}
                               </div>
                               <p style={styles.requestDate}>
                                 Requested {formatDate(request.created_at)}
@@ -836,21 +1067,41 @@ export default function GroupViewPage() {
                               )}
                             </div>
                           </div>
-                          
+
                           <div style={styles.requestActions}>
                             <button
                               style={styles.acceptButton}
-                              onClick={() => handleJoinRequestResponse(request.id, true, request.requester_uid)}
-                              disabled={loadingAction === `accepting-${request.id}`}
+                              onClick={() =>
+                                handleJoinRequestResponse(
+                                  request.id,
+                                  true,
+                                  request.requester_uid
+                                )
+                              }
+                              disabled={
+                                loadingAction === `accepting-${request.id}`
+                              }
                             >
-                              {loadingAction === `accepting-${request.id}` ? "Accepting..." : "Accept"}
+                              {loadingAction === `accepting-${request.id}`
+                                ? "Accepting..."
+                                : "Accept"}
                             </button>
                             <button
                               style={styles.rejectButton}
-                              onClick={() => handleJoinRequestResponse(request.id, false, request.requester_uid)}
-                              disabled={loadingAction === `rejecting-${request.id}`}
+                              onClick={() =>
+                                handleJoinRequestResponse(
+                                  request.id,
+                                  false,
+                                  request.requester_uid
+                                )
+                              }
+                              disabled={
+                                loadingAction === `rejecting-${request.id}`
+                              }
                             >
-                              {loadingAction === `rejecting-${request.id}` ? "Rejecting..." : "Reject"}
+                              {loadingAction === `rejecting-${request.id}`
+                                ? "Rejecting..."
+                                : "Reject"}
                             </button>
                           </div>
                         </div>
@@ -917,10 +1168,131 @@ const styles = {
     color: "#333",
     fontWeight: "600",
   },
+  titleWithEdit: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  editNameButton: {
+    background: "none",
+    border: "1px solid #ddd",
+    borderRadius: "4px",
+    padding: "4px 6px",
+    cursor: "pointer",
+    fontSize: "14px",
+    transition: "all 0.2s ease",
+    opacity: "0.7",
+  },
+  editNameContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    flex: "1",
+  },
+  editNameInput: {
+    fontSize: "28px",
+    fontWeight: "600",
+    color: "#333",
+    border: "2px solid #007bff",
+    borderRadius: "6px",
+    padding: "8px 12px",
+    outline: "none",
+    backgroundColor: "white",
+  },
+  editNameActions: {
+    display: "flex",
+    gap: "8px",
+  },
+  saveNameButton: {
+    backgroundColor: "#28a745",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    padding: "6px 12px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "background-color 0.2s ease",
+  },
+  cancelNameButton: {
+    backgroundColor: "#6c757d",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    padding: "6px 12px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "background-color 0.2s ease",
+  },
   groupDescription: {
     fontSize: "16px",
     color: "#555",
     lineHeight: "1.5",
+  },
+  descriptionWithEdit: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "8px",
+    marginTop: "8px",
+  },
+  noDescription: {
+    fontSize: "16px",
+    color: "#999",
+    fontStyle: "italic",
+    lineHeight: "1.5",
+  },
+  editDescriptionButton: {
+    background: "none",
+    border: "1px solid #ddd",
+    borderRadius: "4px",
+    padding: "4px 6px",
+    cursor: "pointer",
+    fontSize: "12px",
+    color: "#666",
+    transition: "all 0.2s ease",
+    marginLeft: "8px",
+  },
+  editDescriptionContainer: {
+    marginTop: "12px",
+  },
+  editDescriptionInput: {
+    width: "100%",
+    padding: "12px",
+    fontSize: "16px",
+    border: "2px solid #007bff",
+    borderRadius: "6px",
+    resize: "vertical",
+    minHeight: "80px",
+    fontFamily: "inherit",
+    lineHeight: "1.5",
+  },
+  editDescriptionActions: {
+    display: "flex",
+    gap: "8px",
+    marginTop: "8px",
+  },
+  saveDescriptionButton: {
+    backgroundColor: "#007bff",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    padding: "8px 16px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "background-color 0.2s ease",
+  },
+  cancelDescriptionButton: {
+    backgroundColor: "#6c757d",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    padding: "8px 16px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "background-color 0.2s ease",
   },
   infoSection: {
     marginBottom: "30px",

@@ -448,6 +448,93 @@ def toggle_group_visibility(group_id):
         return jsonify({"error": str(e)}), 500
 
 
+@bp.route("/<int:group_id>/info/", methods=["PUT", "OPTIONS"])
+def update_group_info(group_id):
+    """Admin updates group information (name, description, etc.)"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    print(f"📝 === UPDATE GROUP {group_id} INFO ===")
+    
+    # Get and verify Firebase token
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    
+    token = auth_header.split(" ", 1)[1]
+    
+    try:
+        from firebase_admin import auth as firebase_auth
+        decoded = firebase_auth.verify_id_token(token)
+        admin_uid = decoded.get("uid")
+        print(f"✅ Token verified! Admin UID: {admin_uid}")
+    except Exception as e:
+        print(f"❌ Token verification error: {e}")
+        return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
+
+    # Get request data
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No request data provided"}), 400
+        
+        # Extract updateable fields
+        name = data.get("name")
+        description = data.get("description")
+        
+        # Validate at least one field is provided
+        if name is None and description is None:
+            return jsonify({"error": "At least one field (name or description) must be provided"}), 400
+        
+        # Validate name if provided
+        if name is not None:
+            name = name.strip()
+            if not name:
+                return jsonify({"error": "Group name cannot be empty"}), 400
+            if len(name) > 100:
+                return jsonify({"error": "Group name must be 100 characters or less"}), 400
+        
+        # Validate description if provided  
+        if description is not None:
+            description = description.strip()
+            if len(description) > 500:
+                return jsonify({"error": "Group description must be 500 characters or less"}), 400
+            
+        print(f"📝 Admin {admin_uid} updating group {group_id}: name='{name}', description='{description}'")
+        
+    except Exception as e:
+        print(f"❌ Error parsing request data: {e}")
+        return jsonify({"error": "Invalid request data"}), 400
+
+    try:
+        # Verify the user is an admin of this group
+        admin_members = GroupRepo.get_group_members(group_id)
+        is_admin = any(m['user_uid'] == admin_uid and m['role'] == 'admin' for m in admin_members)
+        
+        if not is_admin:
+            return jsonify({"error": "You must be an admin to update group information"}), 403
+        
+        # Update the group information
+        result = GroupRepo.update_group_info(group_id, name=name, description=description)
+        
+        if result["success"]:
+            return jsonify({
+                "success": True,
+                "message": result["message"]
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": result["error"]
+            }), 400
+            
+    except Exception as e:
+        print(f"💥 Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 @bp.route("/feed/", methods=["GET", "OPTIONS"])
 def get_group_feed():
     """Get recommended groups for the user based on course overlap"""

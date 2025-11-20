@@ -41,17 +41,17 @@ export default function GroupFeedPage() {
       if (response.ok) {
         const data = await response.json();
         console.log("📊 Group feed data:", data);
-        
+
         const userCourses = data.user_courses || [];
         const groups = data.groups || [];
-        
+
         setUserCourses(userCourses);
-        
+
         // Use ranking engine to sort the groups
         console.log("🎯 Ranking groups with user courses:", userCourses);
         const rankedGroups = rankGroups(userCourses, groups);
         console.log("📈 Ranked groups:", rankedGroups);
-        
+
         setGroups(rankedGroups); // Store the ranked groups
       } else {
         const errorData = await response.json();
@@ -85,39 +85,48 @@ export default function GroupFeedPage() {
       console.log(`🚪 Requesting to join group ${groupId} (${groupName})`);
       const token = await user.getIdToken();
 
-      const response = await fetch(`http://localhost:5000/api/group-requests/`, {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          group_id: groupId,
-          message: `Hi! I'd like to join the ${groupName} study group.`
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/group-requests/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            group_id: groupId,
+            message: `Hi! I'd like to join the ${groupName} study group.`,
+          }),
+        }
+      );
 
       console.log("📡 Join request response status:", response.status);
 
       if (response.ok) {
         const data = await response.json();
         console.log("📊 Join request data:", data);
-        
+
         if (data.auto_accepted) {
-          alert(`🎉 Successfully joined ${groupName}! You were automatically added to this public group.`);
+          alert(
+            `🎉 Successfully joined ${groupName}! You were automatically added to this public group.`
+          );
           // Refresh the feed to remove the group from the list
           handleRefresh();
         } else {
-          alert(`📝 Join request sent for ${groupName}! Wait for admin approval.`);
+          alert(
+            `📝 Join request sent for ${groupName}! Wait for admin approval.`
+          );
         }
       } else {
         const errorData = await response.json();
         console.error("❌ Join request error:", errorData);
-        
+
         if (errorData.error.includes("already a member")) {
           alert(`You're already a member of ${groupName}!`);
         } else if (errorData.error.includes("pending request")) {
-          alert(`You already have a pending request for ${groupName}. Please wait for admin approval.`);
+          alert(
+            `You already have a pending request for ${groupName}. Please wait for admin approval.`
+          );
         } else {
           alert(`Failed to join ${groupName}: ${errorData.error}`);
         }
@@ -214,7 +223,9 @@ export default function GroupFeedPage() {
                 <div className="group-feed-group-title-section">
                   <h3 className="group-feed-group-name">{group.name}</h3>
                   <div className="group-feed-badges">
-                    <span className={getOverlapBadgeClass(group.sharedCoursesCount)}>
+                    <span
+                      className={getOverlapBadgeClass(group.sharedCoursesCount)}
+                    >
                       {group.sharedCoursesCount} shared course
                       {group.sharedCoursesCount !== 1 ? "s" : ""}
                     </span>
