@@ -1,0 +1,140 @@
+/* ProfilePage.css - Styles for Profile page component */
+
+.profile-page-container {
+  max-width: 600px;
+  margin: 48px auto;
+  padding: 20px;
+}
+
+.profile-page-title {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.profile-page-error {
+  color: #dc3545;
+  margin-top: 8px;
+  padding: 12px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.profile-page-success {
+  color: #155724;
+  margin-top: 8px;
+  padding: 12px;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.profile-page-form {
+  margin-top: 24px;
+}
+
+.profile-page-form-group {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.profile-page-label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.profile-page-input,
+.profile-page-select,
+.profile-page-textarea {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.profile-page-input:focus,
+.profile-page-select:focus,
+.profile-page-textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.profile-page-textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.profile-page-submit-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.profile-page-submit-button:hover {
+  background-color: #0056b3;
+}
+
+.profile-page-submit-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.profile-page-divider {
+  margin: 32px 0;
+  border: none;
+  height: 1px;
+  background-color: #e9ecef;
+}
+
+/* Password change section styles */
+.password-change-section {
+  margin-top: 32px;
+}
+
+.password-change-title {
+  font-size: 1.75rem;
+  color: #333;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.password-change-form {
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .profile-page-container {
+    margin: 24px auto;
+    padding: 16px;
+  }
+
+  .profile-page-title {
+    font-size: 2rem;
+  }
+
+  .password-change-title {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,46 @@
+/* AuthPage.css - Additional styles specific to AuthPage component */
+
+.username-input-container {
+  position: relative;
+}
+
+.username-input-with-validation {
+  border-color: var(--border-default);
+  transition: border-color 0.2s ease;
+}
+
+.username-input-with-validation.available {
+  border-color: #51cf66;
+}
+
+.username-input-with-validation.taken {
+  border-color: #ff6b6b;
+}
+
+.username-checking-indicator {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #666;
+}
+
+.username-feedback {
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+}
+
+.username-feedback.available {
+  color: #51cf66;
+}
+
+.username-feedback.taken {
+  color: #ff6b6b;
+}
+
+:root {
+  --border-default: #ddd;
+}

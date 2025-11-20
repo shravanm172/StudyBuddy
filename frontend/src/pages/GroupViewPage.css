@@ -1,0 +1,824 @@
+/* GroupViewPage.css - Styles for Group View page component */
+
+.group-view-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.group-view-loading-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.group-view-error-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.group-view-error {
+  color: #dc3545;
+  margin-top: 8px;
+  padding: 12px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.group-view-back-button {
+  padding: 8px 16px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-back-button:hover {
+  background-color: #5a6268;
+}
+
+/* Header Section */
+.group-view-header-section {
+  margin-bottom: 30px;
+}
+
+.group-view-group-header {
+  background-color: #f8f9fa;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.group-view-group-title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.group-view-group-title {
+  margin: 0;
+  font-size: 28px;
+  color: #333;
+  font-weight: 600;
+}
+
+.group-view-title-with-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.group-view-edit-name-button {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.group-view-edit-name-button:hover {
+  opacity: 1;
+  background-color: #f8f9fa;
+}
+
+.group-view-edit-name-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.group-view-edit-name-input {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  border: 2px solid #007bff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  outline: none;
+  background-color: white;
+}
+
+.group-view-edit-name-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.group-view-save-name-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-save-name-button:hover {
+  background-color: #218838;
+}
+
+.group-view-cancel-name-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-cancel-name-button:hover {
+  background-color: #5a6268;
+}
+
+/* Role Badge */
+.group-view-role-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.group-view-role-badge.admin {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.group-view-role-badge.member {
+  background-color: #d1edff;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+/* Description Section */
+.group-view-group-description {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.group-view-description-with-edit {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.group-view-no-description {
+  font-size: 16px;
+  color: #999;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.group-view-edit-description-button {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.group-view-edit-description-button:hover {
+  background-color: #f8f9fa;
+}
+
+.group-view-edit-description-container {
+  margin-top: 12px;
+}
+
+.group-view-edit-description-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 2px solid #007bff;
+  border-radius: 6px;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.group-view-edit-description-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.group-view-save-description-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-save-description-button:hover {
+  background-color: #0056b3;
+}
+
+.group-view-cancel-description-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-cancel-description-button:hover {
+  background-color: #5a6268;
+}
+
+/* Info Section */
+.group-view-info-section {
+  margin-bottom: 30px;
+}
+
+.group-view-section-title {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.group-view-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.group-view-info-item {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Courses Section */
+.group-view-courses-section {
+  margin-bottom: 30px;
+}
+
+.group-view-courses-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.group-view-add-course-button {
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-add-course-button:hover {
+  background-color: #218838;
+}
+
+.group-view-course-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.group-view-course-select {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.group-view-confirm-button {
+  padding: 8px 16px;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-confirm-button:hover {
+  background-color: #0056b3;
+}
+
+.group-view-courses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.group-view-course-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+
+.group-view-course-info {
+  flex: 1;
+}
+
+.group-view-course-id {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #007acc;
+}
+
+.group-view-course-title {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.group-view-remove-course-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.group-view-remove-course-button:hover {
+  background-color: #c82333;
+}
+
+.group-view-no-courses-message {
+  text-align: center;
+  padding: 30px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  color: #666;
+}
+
+.group-view-admin-hint {
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 8px;
+  color: #888;
+}
+
+/* Members Section */
+.group-view-members-section {
+  margin-bottom: 30px;
+}
+
+.group-view-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.group-view-member-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.group-view-member-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.group-view-member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #007acc;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.group-view-member-details {
+  flex: 1;
+}
+
+.group-view-member-name {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.group-view-member-join-date {
+  margin: 0;
+  font-size: 12px;
+  color: #888;
+}
+
+.group-view-member-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.group-view-kick-button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.group-view-kick-button:hover {
+  background-color: #c82333;
+}
+
+/* Actions Section */
+.group-view-actions-section {
+  background-color: #f8f9fa;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.group-view-action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.group-view-admin-button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-admin-button:hover {
+  background-color: #218838;
+}
+
+.group-view-leave-button {
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-leave-button:hover {
+  background-color: #c82333;
+}
+
+.group-view-disabled-button {
+  background-color: #6c757d !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
+.group-view-admin-notes {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.group-view-admin-note {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+  margin: 0;
+}
+
+.group-view-warning-note {
+  font-size: 14px;
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.group-view-success-note {
+  font-size: 14px;
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Join Requests Section */
+.group-view-join-requests-section {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+.group-view-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.group-view-header-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.group-view-refresh-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.group-view-refresh-button:hover {
+  background-color: #5a6268;
+}
+
+.group-view-toggle-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-toggle-button:hover {
+  background-color: #0056b3;
+}
+
+.group-view-requests-container {
+  background-color: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.group-view-loading-text {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  margin: 0;
+}
+
+.group-view-empty-text {
+  text-align: center;
+  color: #999;
+  margin: 0;
+}
+
+.group-view-requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.group-view-request-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+}
+
+.group-view-request-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.group-view-requester-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.group-view-request-details {
+  flex: 1;
+}
+
+.group-view-requester-name {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.group-view-profile-info {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.group-view-profile-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 12px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+}
+
+.group-view-request-date {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.group-view-request-message {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+  font-style: italic;
+}
+
+.group-view-request-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.group-view-accept-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-accept-button:hover {
+  background-color: #218838;
+}
+
+.group-view-reject-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-view-reject-button:hover {
+  background-color: #c82333;
+}
+
+@media (max-width: 768px) {
+  .group-view-container {
+    padding: 16px;
+  }
+
+  .group-view-group-title {
+    font-size: 24px;
+  }
+
+  .group-view-edit-name-input {
+    font-size: 24px;
+  }
+
+  .group-view-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .group-view-action-buttons {
+    flex-direction: column;
+  }
+
+  .group-view-admin-button,
+  .group-view-leave-button {
+    width: 100%;
+  }
+
+  .group-view-member-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .group-view-member-actions {
+    align-self: flex-end;
+  }
+
+  .group-view-request-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .group-view-request-actions {
+    align-self: flex-end;
+  }
+}

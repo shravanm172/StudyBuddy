@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 import "../auth.css";
+import "./AuthPage.css";
 
 export default function AuthPage() {
   const { user, initializing, login, signup } = useAuth();
@@ -179,57 +180,31 @@ export default function AuthPage() {
         {mode === "signup" && (
           <>
             {/* NEW: Username field with availability check */}
-            <div style={{ position: "relative" }}>
+            <div className="username-input-container">
               <input
-                className="auth-input"
+                className={`auth-input username-input-with-validation ${
+                  usernameAvailable === false
+                    ? "taken"
+                    : usernameAvailable === true
+                    ? "available"
+                    : ""
+                }`}
                 placeholder="Username (min 3 chars)"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 disabled={submitting}
-                style={{
-                  borderColor:
-                    usernameAvailable === false
-                      ? "#ff6b6b"
-                      : usernameAvailable === true
-                      ? "#51cf66"
-                      : "",
-                }}
               />
               {usernameChecking && (
-                <span
-                  style={{
-                    position: "absolute",
-                    right: "10px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    fontSize: "12px",
-                  }}
-                >
-                  Checking...
-                </span>
+                <span className="username-checking-indicator">Checking...</span>
               )}
               {usernameAvailable === false && (
-                <span
-                  style={{
-                    fontSize: "12px",
-                    color: "#ff6b6b",
-                    marginTop: "4px",
-                    display: "block",
-                  }}
-                >
+                <span className="username-feedback taken">
                   Username is taken
                 </span>
               )}
               {usernameAvailable === true && (
-                <span
-                  style={{
-                    fontSize: "12px",
-                    color: "#51cf66",
-                    marginTop: "4px",
-                    display: "block",
-                  }}
-                >
+                <span className="username-feedback available">
                   Username available!
                 </span>
               )}

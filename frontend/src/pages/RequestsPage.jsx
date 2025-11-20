@@ -1,6 +1,7 @@
 // src/pages/RequestsPage.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
+import "./RequestsPage.css";
 
 export default function RequestsPage() {
   const { user } = useAuth();
@@ -197,45 +198,8 @@ export default function RequestsPage() {
     });
   };
 
-  const getStatusBadgeStyle = (status) => {
-    const baseStyle = {
-      padding: "4px 12px",
-      borderRadius: "12px",
-      fontSize: "12px",
-      fontWeight: "600",
-      textTransform: "uppercase",
-    };
-
-    switch (status) {
-      case "pending":
-        return {
-          ...baseStyle,
-          backgroundColor: "#fff3cd",
-          color: "#856404",
-          border: "1px solid #ffeaa7",
-        };
-      case "accepted":
-        return {
-          ...baseStyle,
-          backgroundColor: "#d1edff",
-          color: "#0c5460",
-          border: "1px solid #bee5eb",
-        };
-      case "rejected":
-        return {
-          ...baseStyle,
-          backgroundColor: "#f8d7da",
-          color: "#721c24",
-          border: "1px solid #f5c6cb",
-        };
-      default:
-        return {
-          ...baseStyle,
-          backgroundColor: "#e2e3e5",
-          color: "#383d41",
-          border: "1px solid #ced4da",
-        };
-    }
+  const getStatusBadgeClass = (status) => {
+    return `requests-page-status-badge ${status}`;
   };
 
   const formatDate = (dateString) => {
@@ -253,8 +217,8 @@ export default function RequestsPage() {
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loadingContainer}>
+      <div className="requests-page-container">
+        <div className="requests-page-loading-container">
           <p>Loading your requests...</p>
         </div>
       </div>
@@ -263,12 +227,12 @@ export default function RequestsPage() {
 
   if (error) {
     return (
-      <div style={styles.container}>
-        <div style={styles.errorContainer}>
+      <div className="requests-page-container">
+        <div className="requests-page-error-container">
           <h1>My Requests</h1>
-          <p style={styles.error}>
+          <div className="requests-page-error">
             <strong>Error:</strong> {error}
-          </p>
+          </div>
         </div>
       </div>
     );
@@ -278,64 +242,64 @@ export default function RequestsPage() {
   const sortedOutgoing = sortRequests(outgoingRequests);
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>My Study Buddy Requests</h1>
-        <p style={styles.subtitle}>
+    <div className="requests-page-container">
+      <header className="requests-page-header">
+        <h1 className="requests-page-title">My Study Buddy Requests</h1>
+        <p className="requests-page-subtitle">
           Manage your incoming and outgoing study buddy requests
         </p>
       </header>
 
       {/* Incoming Requests Section */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>
+      <section className="requests-page-section">
+        <h2 className="requests-page-section-title">
           Incoming Requests ({incomingRequests.length})
         </h2>
-        <p style={styles.sectionSubtitle}>
+        <p className="requests-page-section-subtitle">
           Requests from other students who want to study with you
         </p>
 
         {sortedIncoming.length === 0 ? (
-          <div style={styles.emptyState}>
+          <div className="requests-page-empty-state">
             <p>No incoming requests yet.</p>
-            <p style={styles.emptyHint}>
+            <p className="requests-page-empty-hint">
               Complete your profile and engage with the people feed to get
               discovered!
             </p>
           </div>
         ) : (
-          <div style={styles.requestsList}>
+          <div className="requests-page-list">
             {sortedIncoming.map((request) => (
-              <div key={request.id} style={styles.requestCard}>
-                <div style={styles.requestHeader}>
-                  <div style={styles.userInfo}>
-                    <div style={styles.avatar}>
+              <div key={request.id} className="requests-page-card">
+                <div className="requests-page-card-header">
+                  <div className="requests-page-user-info">
+                    <div className="requests-page-avatar">
                       {request.sender_username?.charAt(0)?.toUpperCase() || "?"}
                     </div>
                     <div>
-                      <h3 style={styles.username}>
+                      <h3 className="requests-page-username">
                         @{request.sender_username}
                       </h3>
-                      <p style={styles.date}>
+                      <p className="requests-page-date">
                         {formatDate(request.created_at)}
                       </p>
                     </div>
                   </div>
-                  <span style={getStatusBadgeStyle(request.status)}>
+                  <span className={getStatusBadgeClass(request.status)}>
                     {request.status}
                   </span>
                 </div>
 
                 {request.message && (
-                  <div style={styles.message}>
+                  <div className="requests-page-message">
                     <strong>Message:</strong> {request.message}
                   </div>
                 )}
 
                 {request.status === "pending" && (
-                  <div style={styles.actions}>
+                  <div className="requests-page-actions">
                     <button
-                      style={styles.acceptButton}
+                      className="requests-page-accept-button"
                       onClick={() => handleAcceptRequest(request.id)}
                       disabled={loadingActions[request.id]}
                     >
@@ -344,7 +308,7 @@ export default function RequestsPage() {
                         : "Accept"}
                     </button>
                     <button
-                      style={styles.rejectButton}
+                      className="requests-page-reject-button"
                       onClick={() => handleRejectRequest(request.id)}
                       disabled={loadingActions[request.id]}
                     >
@@ -361,55 +325,55 @@ export default function RequestsPage() {
       </section>
 
       {/* Outgoing Requests Section */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>
+      <section className="requests-page-section">
+        <h2 className="requests-page-section-title">
           Outgoing Requests ({outgoingRequests.length})
         </h2>
-        <p style={styles.sectionSubtitle}>
+        <p className="requests-page-section-subtitle">
           Requests you've sent to other students
         </p>
 
         {sortedOutgoing.length === 0 ? (
-          <div style={styles.emptyState}>
+          <div className="requests-page-empty-state">
             <p>No outgoing requests yet.</p>
-            <p style={styles.emptyHint}>
+            <p className="requests-page-empty-hint">
               Browse the people feed to discover and connect with study buddies!
             </p>
           </div>
         ) : (
-          <div style={styles.requestsList}>
+          <div className="requests-page-list">
             {sortedOutgoing.map((request) => (
-              <div key={request.id} style={styles.requestCard}>
-                <div style={styles.requestHeader}>
-                  <div style={styles.userInfo}>
-                    <div style={styles.avatar}>
+              <div key={request.id} className="requests-page-card">
+                <div className="requests-page-card-header">
+                  <div className="requests-page-user-info">
+                    <div className="requests-page-avatar">
                       {request.receiver_username?.charAt(0)?.toUpperCase() ||
                         "?"}
                     </div>
                     <div>
-                      <h3 style={styles.username}>
+                      <h3 className="requests-page-username">
                         @{request.receiver_username}
                       </h3>
-                      <p style={styles.date}>
+                      <p className="requests-page-date">
                         {formatDate(request.created_at)}
                       </p>
                     </div>
                   </div>
-                  <span style={getStatusBadgeStyle(request.status)}>
+                  <span className={getStatusBadgeClass(request.status)}>
                     {request.status}
                   </span>
                 </div>
 
                 {request.message && (
-                  <div style={styles.message}>
+                  <div className="requests-page-message">
                     <strong>Your message:</strong> {request.message}
                   </div>
                 )}
 
                 {request.status === "pending" && (
-                  <div style={styles.actions}>
+                  <div className="requests-page-actions">
                     <button
-                      style={styles.cancelButton}
+                      className="requests-page-cancel-button"
                       onClick={() => handleCancelRequest(request.id)}
                       disabled={loadingActions[request.id]}
                     >
@@ -427,149 +391,3 @@ export default function RequestsPage() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: "900px",
-    margin: "0 auto",
-    padding: "20px",
-  },
-  loadingContainer: {
-    textAlign: "center",
-    padding: "60px 20px",
-  },
-  errorContainer: {
-    textAlign: "center",
-    padding: "40px 20px",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "40px",
-    paddingBottom: "20px",
-    borderBottom: "1px solid #e0e0e0",
-  },
-  subtitle: {
-    color: "#666",
-    fontSize: "16px",
-    margin: "8px 0 0 0",
-  },
-  error: {
-    color: "red",
-    marginTop: "8px",
-  },
-  section: {
-    marginBottom: "40px",
-  },
-  sectionTitle: {
-    fontSize: "24px",
-    color: "#333",
-    marginBottom: "8px",
-  },
-  sectionSubtitle: {
-    color: "#666",
-    fontSize: "14px",
-    marginBottom: "20px",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "40px 20px",
-    backgroundColor: "#f8f9fa",
-    borderRadius: "8px",
-    color: "#666",
-  },
-  emptyHint: {
-    fontSize: "14px",
-    marginTop: "8px",
-    fontStyle: "italic",
-  },
-  requestsList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-  },
-  requestCard: {
-    border: "1px solid #e0e0e0",
-    borderRadius: "12px",
-    padding: "20px",
-    backgroundColor: "#fff",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  },
-  requestHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: "16px",
-  },
-  userInfo: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  avatar: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    backgroundColor: "#007acc",
-    color: "white",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "16px",
-    fontWeight: "bold",
-  },
-  username: {
-    margin: "0 0 4px 0",
-    fontSize: "16px",
-    color: "#333",
-  },
-  date: {
-    margin: "0",
-    fontSize: "12px",
-    color: "#888",
-  },
-  message: {
-    backgroundColor: "#f8f9fa",
-    padding: "12px",
-    borderRadius: "8px",
-    marginBottom: "16px",
-    fontSize: "14px",
-    lineHeight: "1.5",
-  },
-  actions: {
-    display: "flex",
-    gap: "8px",
-  },
-  acceptButton: {
-    padding: "8px 16px",
-    backgroundColor: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  rejectButton: {
-    padding: "8px 16px",
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  cancelButton: {
-    padding: "8px 16px",
-    backgroundColor: "#6c757d",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-};

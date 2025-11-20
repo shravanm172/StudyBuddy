@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
+import "./Landing.css";
 
 export default function Landing() {
   const { user, logout } = useAuth();
@@ -45,52 +46,58 @@ export default function Landing() {
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: "48px auto" }}>
-      <h1>Welcome{user?.email ? `, ${user.email}` : ""} 🎉</h1>
-      <p>You’re in. This is the basic landing page.</p>
+    <div className="landing-container">
+      <h1 className="landing-title">
+        Welcome{user?.email ? `, ${user.email}` : ""} 🎉
+      </h1>
+      <p className="landing-description">
+        You're in. This is the basic landing page.
+      </p>
 
-      <button onClick={logout} style={{ marginRight: 16 }}>
-        Log out
-      </button>
+      <div className="landing-nav-buttons">
+        <button className="landing-button secondary" onClick={logout}>
+          Log out
+        </button>
 
-      <button onClick={handleTestBackend} style={{ marginRight: 16 }}>
-        Test Backend /api/users/me
-      </button>
+        <button className="landing-button" onClick={handleTestBackend}>
+          Test Backend /api/users/me
+        </button>
 
-      <button onClick={() => navigate("/account")} style={{ marginRight: 16 }}>
-        Manage Profile
-      </button>
+        <button className="landing-button" onClick={() => navigate("/account")}>
+          Manage Profile
+        </button>
 
-      <button onClick={() => navigate("/people")} style={{ marginRight: 16 }}>
-        People Feed
-      </button>
+        <button className="landing-button" onClick={() => navigate("/people")}>
+          People Feed
+        </button>
 
-      <button onClick={() => navigate("/requests")} style={{ marginRight: 16 }}>
-        My Requests
-      </button>
+        <button
+          className="landing-button"
+          onClick={() => navigate("/requests")}
+        >
+          My Requests
+        </button>
 
-      <button onClick={() => navigate("/groups")} style={{ marginRight: 16 }}>
-        My Groups
-      </button>
+        <button className="landing-button" onClick={() => navigate("/groups")}>
+          My Groups
+        </button>
 
-      <button onClick={() => navigate("/group-feed")}>Find Groups</button>
+        <button
+          className="landing-button"
+          onClick={() => navigate("/group-feed")}
+        >
+          Find Groups
+        </button>
+      </div>
 
       {testError && (
-        <p style={{ color: "red", marginTop: 16 }}>
+        <div className="landing-error">
           <strong>Error:</strong> {testError}
-        </p>
+        </div>
       )}
 
       {testResult && (
-        <pre
-          style={{
-            background: "#111",
-            color: "#0f0",
-            padding: "12px",
-            marginTop: 16,
-            borderRadius: 8,
-          }}
-        >
+        <pre className="landing-test-result">
           {JSON.stringify(testResult, null, 2)}
         </pre>
       )}

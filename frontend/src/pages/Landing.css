@@ -1,0 +1,105 @@
+/* Landing.css - Styles for Landing page component */
+
+.landing-container {
+  max-width: 600px;
+  margin: 48px auto;
+  padding: 20px;
+}
+
+.landing-title {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.landing-description {
+  font-size: 1.125rem;
+  color: #666;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.landing-nav-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.landing-button {
+  padding: 12px 24px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.landing-button:hover {
+  background-color: #0056b3;
+  color: white;
+  text-decoration: none;
+}
+
+.landing-button.secondary {
+  background-color: #6c757d;
+}
+
+.landing-button.secondary:hover {
+  background-color: #545b62;
+}
+
+.landing-test-section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid #e9ecef;
+}
+
+.landing-error {
+  color: #dc3545;
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.landing-test-result {
+  background-color: #000;
+  color: #00ff00;
+  padding: 12px;
+  margin-top: 16px;
+  border-radius: 8px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .landing-container {
+    margin: 24px auto;
+    padding: 16px;
+  }
+
+  .landing-title {
+    font-size: 2rem;
+  }
+
+  .landing-nav-buttons {
+    flex-direction: column;
+  }
+
+  .landing-button {
+    text-align: center;
+  }
+}

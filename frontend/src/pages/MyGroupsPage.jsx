@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import "./MyGroupsPage.css";
 
 export default function MyGroupsPage() {
   const { user } = useAuth();
@@ -63,29 +64,11 @@ export default function MyGroupsPage() {
     navigate(`/groups/${group.id}`);
   };
 
-  const getRoleBadgeStyle = (role) => {
-    const baseStyle = {
-      padding: "4px 8px",
-      borderRadius: "12px",
-      fontSize: "11px",
-      fontWeight: "600",
-      textTransform: "uppercase",
-    };
-
+  const getRoleBadgeClass = (role) => {
     if (role === "admin") {
-      return {
-        ...baseStyle,
-        backgroundColor: "#fff3cd",
-        color: "#856404",
-        border: "1px solid #ffeaa7",
-      };
+      return "my-groups-role-badge admin";
     } else {
-      return {
-        ...baseStyle,
-        backgroundColor: "#d1edff",
-        color: "#0c5460",
-        border: "1px solid #bee5eb",
-      };
+      return "my-groups-role-badge member";
     }
   };
 
@@ -112,8 +95,8 @@ export default function MyGroupsPage() {
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loadingContainer}>
+      <div className="my-groups-container">
+        <div className="my-groups-loading-container">
           <p>Loading your groups...</p>
         </div>
       </div>
@@ -122,35 +105,35 @@ export default function MyGroupsPage() {
 
   if (error) {
     return (
-      <div style={styles.container}>
-        <div style={styles.errorContainer}>
+      <div className="my-groups-container">
+        <div className="my-groups-error-container">
           <h1>My Groups</h1>
-          <p style={styles.error}>
+          <div className="my-groups-error">
             <strong>Error:</strong> {error}
-          </p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>My Study Groups</h1>
-        <p style={styles.subtitle}>
+    <div className="my-groups-container">
+      <header className="my-groups-header">
+        <h1 className="my-groups-title">My Study Groups</h1>
+        <p className="my-groups-subtitle">
           Manage your study groups and collaborate with your study buddies
         </p>
       </header>
 
       {groups.length === 0 ? (
-        <div style={styles.emptyState}>
+        <div className="my-groups-empty-state">
           <h2>No groups yet</h2>
           <p>
             You haven't joined any study groups yet. Start by connecting with
             study buddies!
           </p>
           <button
-            style={styles.primaryButton}
+            className="my-groups-primary-button"
             onClick={() => navigate("/people")}
           >
             Find Study Buddies
@@ -158,25 +141,25 @@ export default function MyGroupsPage() {
         </div>
       ) : (
         <>
-          <div style={styles.groupsInfo}>
+          <div className="my-groups-info">
             <p>
               You're a member of <strong>{groups.length}</strong> study group
               {groups.length !== 1 ? "s" : ""}
             </p>
           </div>
 
-          <div style={styles.groupsContainer}>
+          <div className="my-groups-container-list">
             {groups.map((group) => (
-              <div key={group.id} style={styles.groupCard}>
-                <div style={styles.groupHeader}>
-                  <div style={styles.groupTitle}>
-                    <h3 style={styles.groupName}>{group.name}</h3>
-                    <span style={getRoleBadgeStyle(group.user_role)}>
+              <div key={group.id} className="my-groups-card">
+                <div className="my-groups-card-header">
+                  <div className="my-groups-card-title">
+                    <h3 className="my-groups-card-name">{group.name}</h3>
+                    <span className={getRoleBadgeClass(group.user_role)}>
                       {group.user_role}
                     </span>
                   </div>
-                  <div style={styles.groupMeta}>
-                    <span style={styles.memberCount}>
+                  <div className="my-groups-card-meta">
+                    <span className="my-groups-member-count">
                       👥 {group.member_count} member
                       {group.member_count !== 1 ? "s" : ""}
                     </span>
@@ -184,28 +167,30 @@ export default function MyGroupsPage() {
                 </div>
 
                 {group.description && (
-                  <div style={styles.groupDescription}>{group.description}</div>
+                  <div className="my-groups-description">
+                    {group.description}
+                  </div>
                 )}
 
-                <div style={styles.groupInfo}>
-                  <div style={styles.groupDetail}>
+                <div className="my-groups-info-grid">
+                  <div className="my-groups-info-item">
                     <strong>Privacy:</strong> {getPrivacyText(group.privacy)}
                   </div>
-                  <div style={styles.groupDetail}>
+                  <div className="my-groups-info-item">
                     <strong>Visibility:</strong>{" "}
                     {getVisibilityText(group.is_visible)}
                   </div>
-                  <div style={styles.groupDetail}>
+                  <div className="my-groups-info-item">
                     <strong>Joined:</strong> {formatDate(group.joined_at)}
                   </div>
-                  <div style={styles.groupDetail}>
+                  <div className="my-groups-info-item">
                     <strong>Created:</strong> {formatDate(group.created_at)}
                   </div>
                 </div>
 
-                <div style={styles.groupActions}>
+                <div className="my-groups-actions">
                   <button
-                    style={styles.viewButton}
+                    className="my-groups-view-button"
                     onClick={() => handleViewGroup(group)}
                   >
                     View Group
@@ -219,148 +204,3 @@ export default function MyGroupsPage() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: "900px",
-    margin: "0 auto",
-    padding: "20px",
-  },
-  loadingContainer: {
-    textAlign: "center",
-    padding: "60px 20px",
-  },
-  errorContainer: {
-    textAlign: "center",
-    padding: "40px 20px",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "40px",
-    paddingBottom: "20px",
-    borderBottom: "1px solid #e0e0e0",
-  },
-  subtitle: {
-    color: "#666",
-    fontSize: "16px",
-    margin: "8px 0 0 0",
-  },
-  error: {
-    color: "red",
-    marginTop: "8px",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "60px 20px",
-    backgroundColor: "#f8f9fa",
-    borderRadius: "12px",
-    color: "#666",
-  },
-  primaryButton: {
-    marginTop: "20px",
-    padding: "12px 24px",
-    backgroundColor: "#007acc",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "16px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  groupsInfo: {
-    textAlign: "center",
-    marginBottom: "30px",
-    color: "#555",
-  },
-  groupsContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px",
-  },
-  groupCard: {
-    border: "1px solid #e0e0e0",
-    borderRadius: "12px",
-    padding: "24px",
-    backgroundColor: "#fff",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-  },
-  groupHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: "16px",
-  },
-  groupTitle: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    flex: 1,
-  },
-  groupName: {
-    margin: "0",
-    fontSize: "20px",
-    color: "#333",
-    fontWeight: "600",
-  },
-  groupMeta: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  memberCount: {
-    fontSize: "14px",
-    color: "#666",
-    fontWeight: "500",
-  },
-  groupDescription: {
-    backgroundColor: "#f8f9fa",
-    padding: "12px",
-    borderRadius: "8px",
-    marginBottom: "16px",
-    fontSize: "14px",
-    lineHeight: "1.5",
-    color: "#555",
-  },
-  groupInfo: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "8px",
-    marginBottom: "20px",
-  },
-  groupDetail: {
-    fontSize: "14px",
-    color: "#666",
-  },
-  groupActions: {
-    display: "flex",
-    gap: "8px",
-    justifyContent: "flex-end",
-  },
-  viewButton: {
-    padding: "8px 16px",
-    backgroundColor: "#007acc",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-};
-
-// Add hover effects
-styles.groupCard[":hover"] = {
-  transform: "translateY(-2px)",
-  boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-};
-
-styles.primaryButton[":hover"] = {
-  backgroundColor: "#0056b3",
-};
-
-styles.viewButton[":hover"] = {
-  backgroundColor: "#0056b3",
-};

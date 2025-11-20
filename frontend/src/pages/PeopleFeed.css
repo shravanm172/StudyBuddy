@@ -1,0 +1,268 @@
+/* PeopleFeed.css - Styles for People Feed page component */
+
+.people-feed-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.people-feed-loading-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.people-feed-error-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.people-feed-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.people-feed-title {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.people-feed-subtitle {
+  color: #666;
+  font-size: 16px;
+  margin: 8px 0 16px 0;
+}
+
+.people-feed-user-info {
+  background-color: #f8f9fa;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+.people-feed-error {
+  color: #dc3545;
+  margin-top: 8px;
+  padding: 12px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.people-feed-suggestion {
+  margin-top: 16px;
+}
+
+.people-feed-link {
+  color: #007acc;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.people-feed-link:hover {
+  text-decoration: underline;
+}
+
+.people-feed-results-info {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #555;
+}
+
+.people-feed-container-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.people-feed-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.people-feed-empty-state h2 {
+  color: #333;
+  margin-bottom: 16px;
+}
+
+/* Modal styles */
+.people-feed-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.people-feed-modal-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.people-feed-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.people-feed-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.people-feed-close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.people-feed-close-button:hover {
+  background-color: #f0f0f0;
+}
+
+.people-feed-modal-body {
+  padding: 24px;
+}
+
+.people-feed-modal-description {
+  color: #666;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.people-feed-message-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.people-feed-message-textarea:focus {
+  border-color: #007acc;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+}
+
+.people-feed-character-count {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+  margin-top: 8px;
+}
+
+.people-feed-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 20px 24px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.people-feed-cancel-button {
+  padding: 10px 20px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.people-feed-cancel-button:hover {
+  background-color: #5a6268;
+}
+
+.people-feed-send-button {
+  padding: 10px 20px;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.people-feed-send-button:hover {
+  background-color: #0056b3;
+}
+
+.people-feed-send-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .people-feed-container {
+    padding: 16px;
+  }
+
+  .people-feed-title {
+    font-size: 2rem;
+  }
+
+  .people-feed-modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+
+  .people-feed-modal-header {
+    padding: 16px 20px;
+  }
+
+  .people-feed-modal-body {
+    padding: 20px;
+  }
+
+  .people-feed-modal-actions {
+    padding: 16px 20px;
+    flex-direction: column;
+  }
+
+  .people-feed-cancel-button,
+  .people-feed-send-button {
+    width: 100%;
+  }
+}

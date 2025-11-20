@@ -1,9 +1,9 @@
-// src/pages/GroupViewPage.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate, useParams } from "react-router-dom";
+import "./GroupViewPage.css";
 
-export default function GroupViewPage() {
+function GroupViewPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { groupId } = useParams();
@@ -577,36 +577,18 @@ export default function GroupViewPage() {
     }
   }, [showRequestsSection, currentUserRole, groupId, user]);
 
-  const getRoleBadgeStyle = (role) => {
-    const baseStyle = {
-      padding: "4px 8px",
-      borderRadius: "12px",
-      fontSize: "11px",
-      fontWeight: "600",
-      textTransform: "uppercase",
-    };
-
+  const getRoleBadgeClass = (role) => {
     if (role === "admin") {
-      return {
-        ...baseStyle,
-        backgroundColor: "#fff3cd",
-        color: "#856404",
-        border: "1px solid #ffeaa7",
-      };
+      return "group-view-role-badge admin";
     } else {
-      return {
-        ...baseStyle,
-        backgroundColor: "#d1edff",
-        color: "#0c5460",
-        border: "1px solid #bee5eb",
-      };
+      return "group-view-role-badge member";
     }
   };
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loadingContainer}>
+      <div className="group-view-container">
+        <div className="group-view-loading-container">
           <p>Loading group details...</p>
         </div>
       </div>
@@ -615,13 +597,16 @@ export default function GroupViewPage() {
 
   if (error) {
     return (
-      <div style={styles.container}>
-        <div style={styles.errorContainer}>
+      <div className="group-view-container">
+        <div className="group-view-error-container">
           <h1>Group Details</h1>
-          <p style={styles.error}>
+          <div className="group-view-error">
             <strong>Error:</strong> {error}
-          </p>
-          <button style={styles.backButton} onClick={() => navigate("/groups")}>
+          </div>
+          <button
+            className="group-view-back-button"
+            onClick={() => navigate("/groups")}
+          >
             Back to My Groups
           </button>
         </div>
@@ -631,14 +616,17 @@ export default function GroupViewPage() {
 
   if (!group) {
     return (
-      <div style={styles.container}>
-        <div style={styles.errorContainer}>
+      <div className="group-view-container">
+        <div className="group-view-error-container">
           <h1>Group Not Found</h1>
           <p>
             The group you're looking for doesn't exist or you don't have access
             to it.
           </p>
-          <button style={styles.backButton} onClick={() => navigate("/groups")}>
+          <button
+            className="group-view-back-button"
+            onClick={() => navigate("/groups")}
+          >
             Back to My Groups
           </button>
         </div>
@@ -647,50 +635,53 @@ export default function GroupViewPage() {
   }
 
   return (
-    <div style={styles.container}>
+    <div className="group-view-container">
       {/* Header */}
-      <div style={styles.headerSection}>
-        <button style={styles.backButton} onClick={() => navigate("/groups")}>
+      <div className="group-view-header-section">
+        <button
+          className="group-view-back-button"
+          onClick={() => navigate("/groups")}
+        >
           ← Back to My Groups
         </button>
 
-        <div style={styles.groupHeader}>
-          <div style={styles.groupTitleSection}>
+        <div className="group-view-group-header">
+          <div className="group-view-group-title-section">
             {editingName ? (
-              <div style={styles.editNameContainer}>
+              <div className="group-view-edit-name-container">
                 <input
                   type="text"
                   value={editedName}
                   onChange={(e) => setEditedName(e.target.value)}
-                  style={styles.editNameInput}
+                  className="group-view-edit-name-input"
                   placeholder="Enter group name"
                   maxLength={100}
                   disabled={savingName}
                 />
-                <div style={styles.editNameActions}>
+                <div className="group-view-edit-name-actions">
                   <button
                     onClick={saveGroupName}
                     disabled={savingName || !editedName.trim()}
-                    style={styles.saveNameButton}
+                    className="group-view-save-name-button"
                   >
                     {savingName ? "Saving..." : "Save"}
                   </button>
                   <button
                     onClick={cancelEditingName}
                     disabled={savingName}
-                    style={styles.cancelNameButton}
+                    className="group-view-cancel-name-button"
                   >
                     Cancel
                   </button>
                 </div>
               </div>
             ) : (
-              <div style={styles.titleWithEdit}>
-                <h1 style={styles.groupTitle}>{group.name}</h1>
+              <div className="group-view-title-with-edit">
+                <h1 className="group-view-group-title">{group.name}</h1>
                 {currentUserRole === "admin" && (
                   <button
                     onClick={startEditingName}
-                    style={styles.editNameButton}
+                    className="group-view-edit-name-button"
                     title="Edit group name"
                   >
                     ✏️
@@ -698,53 +689,57 @@ export default function GroupViewPage() {
                 )}
               </div>
             )}
-            <span style={getRoleBadgeStyle(currentUserRole)}>
+            <span className={getRoleBadgeClass(currentUserRole)}>
               {currentUserRole}
             </span>
           </div>
 
           {/* Group Description Section */}
           {editingDescription ? (
-            <div style={styles.editDescriptionContainer}>
+            <div className="group-view-edit-description-container">
               <textarea
                 value={editedDescription}
                 onChange={(e) => setEditedDescription(e.target.value)}
-                style={styles.editDescriptionInput}
+                className="group-view-edit-description-input"
                 placeholder="Enter group description (optional)"
                 maxLength={500}
                 disabled={savingDescription}
                 rows={3}
               />
-              <div style={styles.editDescriptionActions}>
+              <div className="group-view-edit-description-actions">
                 <button
                   onClick={saveGroupDescription}
                   disabled={savingDescription}
-                  style={styles.saveDescriptionButton}
+                  className="group-view-save-description-button"
                 >
                   {savingDescription ? "Saving..." : "Save"}
                 </button>
                 <button
                   onClick={cancelEditingDescription}
                   disabled={savingDescription}
-                  style={styles.cancelDescriptionButton}
+                  className="group-view-cancel-description-button"
                 >
                   Cancel
                 </button>
               </div>
             </div>
           ) : (
-            <div style={styles.descriptionWithEdit}>
+            <div className="group-view-description-with-edit">
               {group.description ? (
-                <div style={styles.groupDescription}>{group.description}</div>
+                <div className="group-view-group-description">
+                  {group.description}
+                </div>
               ) : (
                 currentUserRole === "admin" && (
-                  <div style={styles.noDescription}>No description set</div>
+                  <div className="group-view-no-description">
+                    No description set
+                  </div>
                 )
               )}
               {currentUserRole === "admin" && (
                 <button
                   onClick={startEditingDescription}
-                  style={styles.editDescriptionButton}
+                  className="group-view-edit-description-button"
                   title="Edit group description"
                 >
                   ✏️
@@ -756,33 +751,33 @@ export default function GroupViewPage() {
       </div>
 
       {/* Group Info */}
-      <div style={styles.infoSection}>
-        <h2 style={styles.sectionTitle}>Group Information</h2>
-        <div style={styles.infoGrid}>
-          <div style={styles.infoItem}>
+      <div className="group-view-info-section">
+        <h2 className="group-view-section-title">Group Information</h2>
+        <div className="group-view-info-grid">
+          <div className="group-view-info-item">
             <strong>Privacy:</strong>{" "}
             {group.privacy === "private" ? "Private" : "Public"}
           </div>
-          <div style={styles.infoItem}>
+          <div className="group-view-info-item">
             <strong>Visibility:</strong>{" "}
             {group.is_visible ? "Visible on feed" : "Private group"}
           </div>
-          <div style={styles.infoItem}>
+          <div className="group-view-info-item">
             <strong>Created:</strong> {formatDate(group.created_at)}
           </div>
-          <div style={styles.infoItem}>
+          <div className="group-view-info-item">
             <strong>Your join date:</strong> {formatDate(group.user_joined_at)}
           </div>
         </div>
       </div>
 
       {/* Courses Section */}
-      <div style={styles.coursesSection}>
-        <div style={styles.coursesSectionHeader}>
-          <h2 style={styles.sectionTitle}>Study Courses</h2>
+      <div className="group-view-courses-section">
+        <div className="group-view-courses-section-header">
+          <h2 className="group-view-section-title">Study Courses</h2>
           {currentUserRole === "admin" && (
             <button
-              style={styles.addCourseButton}
+              className="group-view-add-course-button"
               onClick={() => setShowCourseForm(!showCourseForm)}
               disabled={loadingAction === "adding_course"}
             >
@@ -792,11 +787,11 @@ export default function GroupViewPage() {
         </div>
 
         {showCourseForm && currentUserRole === "admin" && (
-          <div style={styles.courseForm}>
+          <div className="group-view-course-form">
             <select
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
-              style={styles.courseSelect}
+              className="group-view-course-select"
               disabled={loadingAction === "adding_course"}
             >
               <option value="">Select a course...</option>
@@ -814,7 +809,7 @@ export default function GroupViewPage() {
                 ))}
             </select>
             <button
-              style={styles.confirmButton}
+              className="group-view-confirm-button"
               onClick={handleAddCourse}
               disabled={!selectedCourse || loadingAction === "adding_course"}
             >
@@ -824,16 +819,16 @@ export default function GroupViewPage() {
         )}
 
         {group.courses && group.courses.length > 0 ? (
-          <div style={styles.coursesList}>
+          <div className="group-view-courses-list">
             {group.courses.map((course) => (
-              <div key={course.course_id} style={styles.courseCard}>
-                <div style={styles.courseInfo}>
-                  <h4 style={styles.courseId}>{course.course_id}</h4>
-                  <p style={styles.courseTitle}>{course.title}</p>
+              <div key={course.course_id} className="group-view-course-card">
+                <div className="group-view-course-info">
+                  <h4 className="group-view-course-id">{course.course_id}</h4>
+                  <p className="group-view-course-title">{course.title}</p>
                 </div>
                 {currentUserRole === "admin" && (
                   <button
-                    style={styles.removeCourseButton}
+                    className="group-view-remove-course-button"
                     onClick={() =>
                       handleRemoveCourse(course.course_id, course.title)
                     }
@@ -851,10 +846,10 @@ export default function GroupViewPage() {
             ))}
           </div>
         ) : (
-          <div style={styles.noCoursesMessage}>
+          <div className="group-view-no-courses-message">
             <p>No courses added yet.</p>
             {currentUserRole === "admin" && (
-              <p style={styles.adminHint}>
+              <p className="group-view-admin-hint">
                 As an admin, you can add courses that this group studies
                 together.
               </p>
@@ -864,12 +859,12 @@ export default function GroupViewPage() {
       </div>
 
       {/* Members Section */}
-      <div style={styles.membersSection}>
-        <h2 style={styles.sectionTitle}>
+      <div className="group-view-members-section">
+        <h2 className="group-view-section-title">
           Members ({group.member_count || members.length})
         </h2>
 
-        <div style={styles.membersList}>
+        <div className="group-view-members-list">
           {members.map((member, index) => {
             const memberUid = member.user_uid || member.user_id;
             const memberUsername = member.username || memberUid;
@@ -880,25 +875,27 @@ export default function GroupViewPage() {
               member.role !== "admin";
 
             return (
-              <div key={memberUid || index} style={styles.memberCard}>
-                <div style={styles.memberInfo}>
-                  <div style={styles.memberAvatar}>
+              <div key={memberUid || index} className="group-view-member-card">
+                <div className="group-view-member-info">
+                  <div className="group-view-member-avatar">
                     {memberUsername.charAt(0).toUpperCase()}
                   </div>
-                  <div style={styles.memberDetails}>
-                    <h4 style={styles.memberName}>@{memberUsername}</h4>
-                    <p style={styles.memberJoinDate}>
+                  <div className="group-view-member-details">
+                    <h4 className="group-view-member-name">
+                      @{memberUsername}
+                    </h4>
+                    <p className="group-view-member-join-date">
                       Joined {formatDate(member.joined_at)}
                     </p>
                   </div>
                 </div>
-                <div style={styles.memberActions}>
-                  <span style={getRoleBadgeStyle(member.role)}>
+                <div className="group-view-member-actions">
+                  <span className={getRoleBadgeClass(member.role)}>
                     {member.role}
                   </span>
                   {canKick && (
                     <button
-                      style={styles.kickButton}
+                      className="group-view-kick-button"
                       onClick={() =>
                         handleKickMember(memberUid, memberUsername)
                       }
@@ -916,20 +913,19 @@ export default function GroupViewPage() {
       </div>
 
       {/* Actions Section */}
-      <div style={styles.actionsSection}>
-        <h2 style={styles.sectionTitle}>Actions</h2>
+      <div className="group-view-actions-section">
+        <h2 className="group-view-section-title">Actions</h2>
 
-        <div style={styles.actionButtons}>
+        <div className="group-view-action-buttons">
           {currentUserRole === "admin" && (
             <>
               <button
-                style={{
-                  ...styles.adminButton,
-                  ...((!group.courses || group.courses.length === 0) &&
+                className={`group-view-admin-button ${
+                  (!group.courses || group.courses.length === 0) &&
                   !group.is_visible
-                    ? styles.disabledButton
-                    : {}),
-                }}
+                    ? "group-view-disabled-button"
+                    : ""
+                }`}
                 onClick={handleToggleVisibility}
                 disabled={loadingAction === "toggling_visibility"}
                 title={
@@ -947,7 +943,7 @@ export default function GroupViewPage() {
           )}
 
           <button
-            style={styles.leaveButton}
+            className="group-view-leave-button"
             onClick={handleLeaveGroup}
             disabled={loadingAction === "leaving"}
           >
@@ -956,20 +952,20 @@ export default function GroupViewPage() {
         </div>
 
         {currentUserRole === "admin" && (
-          <div style={styles.adminNotes}>
-            <p style={styles.adminNote}>
+          <div className="group-view-admin-notes">
+            <p className="group-view-admin-note">
               💡 As an admin, you can manage group visibility and remove
               members.
             </p>
             {(!group.courses || group.courses.length === 0) &&
               !group.is_visible && (
-                <p style={styles.warningNote}>
+                <p className="group-view-warning-note">
                   ⚠️ Add at least one course to make this group discoverable on
                   the public feed.
                 </p>
               )}
             {group.is_visible && (
-              <p style={styles.successNote}>
+              <p className="group-view-success-note">
                 ✅ This group is visible on the public feed - students studying{" "}
                 {group.courses?.map((c) => c.course_id).join(", ")} can discover
                 it!
@@ -980,13 +976,13 @@ export default function GroupViewPage() {
 
         {/* Join Requests Management Section - Admin Only */}
         {currentUserRole === "admin" && (
-          <div style={styles.joinRequestsSection}>
-            <div style={styles.sectionHeader}>
-              <h2 style={styles.sectionTitle}>Join Requests</h2>
-              <div style={styles.headerButtons}>
+          <div className="group-view-join-requests-section">
+            <div className="group-view-section-header">
+              <h2 className="group-view-section-title">Join Requests</h2>
+              <div className="group-view-header-buttons">
                 {showRequestsSection && (
                   <button
-                    style={styles.refreshButton}
+                    className="group-view-refresh-button"
                     onClick={loadPendingRequests}
                     disabled={loadingRequests}
                     title="Refresh requests"
@@ -995,7 +991,7 @@ export default function GroupViewPage() {
                   </button>
                 )}
                 <button
-                  style={styles.toggleButton}
+                  className="group-view-toggle-button"
                   onClick={() => {
                     if (!showRequestsSection) {
                       // Load requests when opening the section
@@ -1015,16 +1011,18 @@ export default function GroupViewPage() {
             </div>
 
             {showRequestsSection && (
-              <div style={styles.requestsContainer}>
+              <div className="group-view-requests-container">
                 {loadingRequests ? (
-                  <p style={styles.loadingText}>Loading pending requests...</p>
+                  <p className="group-view-loading-text">
+                    Loading pending requests...
+                  </p>
                 ) : pendingRequests.length === 0 ? (
-                  <p style={styles.emptyText}>
+                  <p className="group-view-empty-text">
                     No pending join requests. When users request to join your
                     private group, they'll appear here.
                   </p>
                 ) : (
-                  <div style={styles.requestsList}>
+                  <div className="group-view-requests-list">
                     {pendingRequests.map((request) => {
                       const profile = request.requester_profile || {};
                       const username =
@@ -1035,42 +1033,47 @@ export default function GroupViewPage() {
                       const avatarLetter = username.charAt(0).toUpperCase();
 
                       return (
-                        <div key={request.id} style={styles.requestCard}>
-                          <div style={styles.requestInfo}>
-                            <div style={styles.requesterAvatar}>
+                        <div
+                          key={request.id}
+                          className="group-view-request-card"
+                        >
+                          <div className="group-view-request-info">
+                            <div className="group-view-requester-avatar">
                               {avatarLetter}
                             </div>
-                            <div style={styles.requestDetails}>
-                              <h4 style={styles.requesterName}>{username}</h4>
-                              <div style={styles.profileInfo}>
+                            <div className="group-view-request-details">
+                              <h4 className="group-view-requester-name">
+                                {username}
+                              </h4>
+                              <div className="group-view-profile-info">
                                 {profile.grade && (
-                                  <span style={styles.profileBadge}>
+                                  <span className="group-view-profile-badge">
                                     {profile.grade}
                                   </span>
                                 )}
                                 {profile.courses &&
                                   profile.courses.length > 0 && (
-                                    <span style={styles.profileBadge}>
+                                    <span className="group-view-profile-badge">
                                       {profile.courses.slice(0, 2).join(", ")}
                                       {profile.courses.length > 2 &&
                                         ` +${profile.courses.length - 2} more`}
                                     </span>
                                   )}
                               </div>
-                              <p style={styles.requestDate}>
+                              <p className="group-view-request-date">
                                 Requested {formatDate(request.created_at)}
                               </p>
                               {request.message && (
-                                <p style={styles.requestMessage}>
+                                <p className="group-view-request-message">
                                   "{request.message}"
                                 </p>
                               )}
                             </div>
                           </div>
 
-                          <div style={styles.requestActions}>
+                          <div className="group-view-request-actions">
                             <button
-                              style={styles.acceptButton}
+                              className="group-view-accept-button"
                               onClick={() =>
                                 handleJoinRequestResponse(
                                   request.id,
@@ -1087,7 +1090,7 @@ export default function GroupViewPage() {
                                 : "Accept"}
                             </button>
                             <button
-                              style={styles.rejectButton}
+                              className="group-view-reject-button"
                               onClick={() =>
                                 handleJoinRequestResponse(
                                   request.id,
@@ -1118,628 +1121,4 @@ export default function GroupViewPage() {
   );
 }
 
-const styles = {
-  container: {
-    maxWidth: "900px",
-    margin: "0 auto",
-    padding: "20px",
-  },
-  loadingContainer: {
-    textAlign: "center",
-    padding: "60px 20px",
-  },
-  errorContainer: {
-    textAlign: "center",
-    padding: "40px 20px",
-  },
-  error: {
-    color: "red",
-    marginTop: "8px",
-  },
-  headerSection: {
-    marginBottom: "30px",
-  },
-  backButton: {
-    padding: "8px 16px",
-    backgroundColor: "#6c757d",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    cursor: "pointer",
-    marginBottom: "20px",
-    transition: "background-color 0.2s ease",
-  },
-  groupHeader: {
-    backgroundColor: "#f8f9fa",
-    padding: "24px",
-    borderRadius: "12px",
-    border: "1px solid #e0e0e0",
-  },
-  groupTitleSection: {
-    display: "flex",
-    alignItems: "center",
-    gap: "16px",
-    marginBottom: "12px",
-  },
-  groupTitle: {
-    margin: "0",
-    fontSize: "28px",
-    color: "#333",
-    fontWeight: "600",
-  },
-  titleWithEdit: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  },
-  editNameButton: {
-    background: "none",
-    border: "1px solid #ddd",
-    borderRadius: "4px",
-    padding: "4px 6px",
-    cursor: "pointer",
-    fontSize: "14px",
-    transition: "all 0.2s ease",
-    opacity: "0.7",
-  },
-  editNameContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    flex: "1",
-  },
-  editNameInput: {
-    fontSize: "28px",
-    fontWeight: "600",
-    color: "#333",
-    border: "2px solid #007bff",
-    borderRadius: "6px",
-    padding: "8px 12px",
-    outline: "none",
-    backgroundColor: "white",
-  },
-  editNameActions: {
-    display: "flex",
-    gap: "8px",
-  },
-  saveNameButton: {
-    backgroundColor: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    padding: "6px 12px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  cancelNameButton: {
-    backgroundColor: "#6c757d",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    padding: "6px 12px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  groupDescription: {
-    fontSize: "16px",
-    color: "#555",
-    lineHeight: "1.5",
-  },
-  descriptionWithEdit: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "8px",
-    marginTop: "8px",
-  },
-  noDescription: {
-    fontSize: "16px",
-    color: "#999",
-    fontStyle: "italic",
-    lineHeight: "1.5",
-  },
-  editDescriptionButton: {
-    background: "none",
-    border: "1px solid #ddd",
-    borderRadius: "4px",
-    padding: "4px 6px",
-    cursor: "pointer",
-    fontSize: "12px",
-    color: "#666",
-    transition: "all 0.2s ease",
-    marginLeft: "8px",
-  },
-  editDescriptionContainer: {
-    marginTop: "12px",
-  },
-  editDescriptionInput: {
-    width: "100%",
-    padding: "12px",
-    fontSize: "16px",
-    border: "2px solid #007bff",
-    borderRadius: "6px",
-    resize: "vertical",
-    minHeight: "80px",
-    fontFamily: "inherit",
-    lineHeight: "1.5",
-  },
-  editDescriptionActions: {
-    display: "flex",
-    gap: "8px",
-    marginTop: "8px",
-  },
-  saveDescriptionButton: {
-    backgroundColor: "#007bff",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    padding: "8px 16px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  cancelDescriptionButton: {
-    backgroundColor: "#6c757d",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    padding: "8px 16px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  infoSection: {
-    marginBottom: "30px",
-  },
-  sectionTitle: {
-    fontSize: "20px",
-    color: "#333",
-    marginBottom: "16px",
-    fontWeight: "600",
-  },
-  infoGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "12px",
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    border: "1px solid #e0e0e0",
-  },
-  infoItem: {
-    fontSize: "14px",
-    color: "#666",
-  },
-  coursesSection: {
-    marginBottom: "30px",
-  },
-  coursesSectionHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "16px",
-  },
-  addCourseButton: {
-    padding: "8px 16px",
-    backgroundColor: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  courseForm: {
-    display: "flex",
-    gap: "12px",
-    marginBottom: "16px",
-    padding: "16px",
-    backgroundColor: "#f8f9fa",
-    borderRadius: "8px",
-    border: "1px solid #e0e0e0",
-  },
-  courseSelect: {
-    flex: 1,
-    padding: "8px 12px",
-    border: "1px solid #ddd",
-    borderRadius: "4px",
-    fontSize: "14px",
-  },
-  confirmButton: {
-    padding: "8px 16px",
-    backgroundColor: "#007acc",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    fontSize: "14px",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  coursesList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-  },
-  courseCard: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "12px 16px",
-    backgroundColor: "#fff",
-    border: "1px solid #e0e0e0",
-    borderRadius: "6px",
-  },
-  courseInfo: {
-    flex: 1,
-  },
-  courseId: {
-    margin: "0 0 4px 0",
-    fontSize: "14px",
-    fontWeight: "600",
-    color: "#007acc",
-  },
-  courseTitle: {
-    margin: "0",
-    fontSize: "13px",
-    color: "#666",
-  },
-  removeCourseButton: {
-    width: "24px",
-    height: "24px",
-    borderRadius: "50%",
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    fontSize: "11px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "all 0.2s ease",
-  },
-  noCoursesMessage: {
-    textAlign: "center",
-    padding: "30px",
-    backgroundColor: "#f8f9fa",
-    borderRadius: "8px",
-    border: "1px solid #e0e0e0",
-    color: "#666",
-  },
-  adminHint: {
-    fontSize: "12px",
-    fontStyle: "italic",
-    marginTop: "8px",
-    color: "#888",
-  },
-  membersSection: {
-    marginBottom: "30px",
-  },
-  membersList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-  },
-  memberCard: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "16px",
-    backgroundColor: "#fff",
-    border: "1px solid #e0e0e0",
-    borderRadius: "8px",
-  },
-  memberInfo: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  memberAvatar: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    backgroundColor: "#007acc",
-    color: "white",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "16px",
-    fontWeight: "bold",
-  },
-  memberDetails: {
-    flex: 1,
-  },
-  memberName: {
-    margin: "0 0 4px 0",
-    fontSize: "16px",
-    color: "#333",
-  },
-  memberJoinDate: {
-    margin: "0",
-    fontSize: "12px",
-    color: "#888",
-  },
-  memberActions: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  },
-  kickButton: {
-    width: "28px",
-    height: "28px",
-    borderRadius: "50%",
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    fontSize: "12px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "all 0.2s ease",
-  },
-  actionsSection: {
-    backgroundColor: "#f8f9fa",
-    padding: "24px",
-    borderRadius: "12px",
-    border: "1px solid #e0e0e0",
-  },
-  actionButtons: {
-    display: "flex",
-    gap: "12px",
-    marginBottom: "16px",
-    flexWrap: "wrap",
-  },
-  adminButton: {
-    padding: "10px 20px",
-    backgroundColor: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  leaveButton: {
-    padding: "10px 20px",
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  adminNote: {
-    fontSize: "14px",
-    color: "#666",
-    fontStyle: "italic",
-    margin: "0",
-  },
-  adminNotes: {
-    marginTop: "16px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-  },
-  warningNote: {
-    fontSize: "14px",
-    color: "#856404",
-    backgroundColor: "#fff3cd",
-    border: "1px solid #ffeaa7",
-    borderRadius: "4px",
-    padding: "8px 12px",
-    margin: "0",
-    fontWeight: "500",
-  },
-  successNote: {
-    fontSize: "14px",
-    color: "#155724",
-    backgroundColor: "#d4edda",
-    border: "1px solid #c3e6cb",
-    borderRadius: "4px",
-    padding: "8px 12px",
-    margin: "0",
-    fontWeight: "500",
-  },
-  disabledButton: {
-    backgroundColor: "#6c757d !important",
-    cursor: "not-allowed !important",
-    opacity: "0.7",
-  },
-  // Join Requests Section Styles
-  joinRequestsSection: {
-    marginTop: "20px",
-    padding: "16px",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    backgroundColor: "#f8f9fa",
-  },
-  sectionHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "16px",
-  },
-  sectionTitle: {
-    margin: "0",
-    fontSize: "18px",
-    fontWeight: "600",
-    color: "#333",
-  },
-  headerButtons: {
-    display: "flex",
-    gap: "8px",
-    alignItems: "center",
-  },
-  refreshButton: {
-    backgroundColor: "#6c757d",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    padding: "8px 10px",
-    fontSize: "14px",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-    minWidth: "32px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  toggleButton: {
-    backgroundColor: "#007bff",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    padding: "8px 16px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  requestsContainer: {
-    backgroundColor: "white",
-    border: "1px solid #e9ecef",
-    borderRadius: "6px",
-    padding: "16px",
-  },
-  loadingText: {
-    textAlign: "center",
-    color: "#666",
-    fontStyle: "italic",
-    margin: "0",
-  },
-  emptyText: {
-    textAlign: "center",
-    color: "#999",
-    margin: "0",
-  },
-  requestsList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-  },
-  requestCard: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "12px",
-    border: "1px solid #e9ecef",
-    borderRadius: "6px",
-    backgroundColor: "#f8f9fa",
-  },
-  requestInfo: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    flex: "1",
-  },
-  requesterAvatar: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    backgroundColor: "#007bff",
-    color: "white",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "bold",
-    fontSize: "16px",
-  },
-  requestDetails: {
-    flex: "1",
-  },
-  requesterName: {
-    margin: "0 0 4px 0",
-    fontSize: "16px",
-    fontWeight: "500",
-    color: "#333",
-  },
-  profileInfo: {
-    display: "flex",
-    gap: "8px",
-    marginBottom: "4px",
-    flexWrap: "wrap",
-  },
-  profileBadge: {
-    fontSize: "11px",
-    fontWeight: "500",
-    padding: "2px 6px",
-    borderRadius: "12px",
-    backgroundColor: "#e3f2fd",
-    color: "#1976d2",
-    border: "1px solid #bbdefb",
-  },
-  requestDate: {
-    margin: "0 0 4px 0",
-    fontSize: "12px",
-    color: "#666",
-  },
-  requestMessage: {
-    margin: "0",
-    fontSize: "14px",
-    color: "#555",
-    fontStyle: "italic",
-  },
-  requestActions: {
-    display: "flex",
-    gap: "8px",
-  },
-  acceptButton: {
-    backgroundColor: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    padding: "6px 12px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  rejectButton: {
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    padding: "6px 12px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-};
-
-// Add hover effects
-styles.backButton[":hover"] = {
-  backgroundColor: "#5a6268",
-};
-
-styles.adminButton[":hover"] = {
-  backgroundColor: "#218838",
-};
-
-styles.leaveButton[":hover"] = {
-  backgroundColor: "#c82333",
-};
-
-styles.toggleButton[":hover"] = {
-  backgroundColor: "#0056b3",
-};
-
-styles.acceptButton[":hover"] = {
-  backgroundColor: "#218838",
-};
-
-styles.rejectButton[":hover"] = {
-  backgroundColor: "#c82333",
-};
+export default GroupViewPage;

@@ -6,6 +6,7 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
+import "./ProfilePage.css";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -147,54 +148,54 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: 600, margin: "48px auto" }}>
+      <div className="profile-page-container">
         <p>Loading profile…</p>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: "48px auto" }}>
-      <h1>My Profile</h1>
+    <div className="profile-page-container">
+      <h1 className="profile-page-title">My Profile</h1>
 
       {error && (
-        <p style={{ color: "red", marginTop: 8 }}>
+        <div className="profile-page-error">
           <strong>Error:</strong> {error}
-        </p>
+        </div>
       )}
-      {success && <p style={{ color: "limegreen", marginTop: 8 }}>{success}</p>}
+      {success && <div className="profile-page-success">{success}</div>}
 
-      <form onSubmit={handleSave} style={{ marginTop: 24 }}>
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Username
+      <form onSubmit={handleSave} className="profile-page-form">
+        <label className="profile-page-form-group">
+          <span className="profile-page-label">Username</span>
           <input
+            className="profile-page-input"
             name="username"
             value={form.username}
             onChange={handleChange}
             placeholder="Enter a unique username"
-            style={{ display: "block", width: "100%", marginTop: 4 }}
             required
           />
         </label>
 
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Date of Birth
+        <label className="profile-page-form-group">
+          <span className="profile-page-label">Date of Birth</span>
           <input
+            className="profile-page-input"
             type="date"
             name="date_of_birth"
             value={form.date_of_birth}
             onChange={handleChange}
-            style={{ display: "block", width: "100%", marginTop: 4 }}
           />
         </label>
 
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Grade
+        <label className="profile-page-form-group">
+          <span className="profile-page-label">Grade</span>
           <select
+            className="profile-page-select"
             name="grade"
             value={form.grade}
             onChange={handleChange}
-            style={{ display: "block", width: "100%", marginTop: 4 }}
             disabled={enumsLoading}
           >
             <option value="" disabled>
@@ -208,13 +209,13 @@ export default function ProfilePage() {
           </select>
         </label>
 
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Gender
+        <label className="profile-page-form-group">
+          <span className="profile-page-label">Gender</span>
           <select
+            className="profile-page-select"
             name="gender"
             value={form.gender}
             onChange={handleChange}
-            style={{ display: "block", width: "100%", marginTop: 4 }}
             disabled={enumsLoading}
           >
             <option value="" disabled>
@@ -228,23 +229,29 @@ export default function ProfilePage() {
           </select>
         </label>
 
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Courses (comma-separated course IDs)
+        <label className="profile-page-form-group">
+          <span className="profile-page-label">
+            Courses (comma-separated course IDs)
+          </span>
           <textarea
+            className="profile-page-textarea"
             name="coursesText"
             value={form.coursesText}
             onChange={handleChange}
             rows={3}
-            style={{ display: "block", width: "100%", marginTop: 4 }}
           />
         </label>
 
-        <button type="submit" disabled={saving}>
+        <button
+          type="submit"
+          className="profile-page-submit-button"
+          disabled={saving}
+        >
           {saving ? "Saving…" : "Save Profile"}
         </button>
       </form>
 
-      <hr style={{ margin: "32px 0" }} />
+      <hr className="profile-page-divider" />
 
       <ChangePasswordSection />
     </div>
@@ -307,47 +314,51 @@ function ChangePasswordSection() {
   }
 
   return (
-    <section>
-      <h2>Change Password</h2>
+    <section className="password-change-section">
+      <h2 className="password-change-title">Change Password</h2>
       {error && (
-        <p style={{ color: "red", marginTop: 8 }}>
+        <div className="profile-page-error">
           <strong>Error:</strong> {error}
-        </p>
+        </div>
       )}
-      {success && <p style={{ color: "limegreen", marginTop: 8 }}>{success}</p>}
+      {success && <div className="profile-page-success">{success}</div>}
 
-      <form onSubmit={handleChangePassword} style={{ marginTop: 16 }}>
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Current Password
+      <form onSubmit={handleChangePassword} className="password-change-form">
+        <label className="profile-page-form-group">
+          <span className="profile-page-label">Current Password</span>
           <input
+            className="profile-page-input"
             type="password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            style={{ display: "block", width: "100%", marginTop: 4 }}
           />
         </label>
 
-        <label style={{ display: "block", marginBottom: 12 }}>
-          New Password
+        <label className="profile-page-form-group">
+          <span className="profile-page-label">New Password</span>
           <input
+            className="profile-page-input"
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            style={{ display: "block", width: "100%", marginTop: 4 }}
           />
         </label>
 
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Confirm New Password
+        <label className="profile-page-form-group">
+          <span className="profile-page-label">Confirm New Password</span>
           <input
+            className="profile-page-input"
             type="password"
             value={confirmNew}
             onChange={(e) => setConfirmNew(e.target.value)}
-            style={{ display: "block", width: "100%", marginTop: 4 }}
           />
         </label>
 
-        <button type="submit" disabled={loading}>
+        <button
+          type="submit"
+          className="profile-page-submit-button"
+          disabled={loading}
+        >
           {loading ? "Updating…" : "Change Password"}
         </button>
       </form>

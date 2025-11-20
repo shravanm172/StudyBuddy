@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import ProfileCard from "../components/ProfileCard";
 import { rankUsers } from "../utils/peopleRankingEngine";
+import "./PeopleFeed.css";
 
 export default function PeopleFeed() {
   const { user } = useAuth();
@@ -404,8 +405,8 @@ export default function PeopleFeed() {
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loadingContainer}>
+      <div className="people-feed-container">
+        <div className="people-feed-loading-container">
           <p>Loading recommendations...</p>
         </div>
       </div>
@@ -414,15 +415,15 @@ export default function PeopleFeed() {
 
   if (error) {
     return (
-      <div style={styles.container}>
-        <div style={styles.errorContainer}>
+      <div className="people-feed-container">
+        <div className="people-feed-error-container">
           <h1>People Feed</h1>
-          <p style={styles.error}>
+          <div className="people-feed-error">
             <strong>Error:</strong> {error}
-          </p>
+          </div>
           {error.includes("complete your profile") && (
-            <p style={styles.suggestion}>
-              <a href="/account" style={styles.link}>
+            <p className="people-feed-suggestion">
+              <a href="/account" className="people-feed-link">
                 Go to Profile Settings
               </a>
             </p>
@@ -433,14 +434,14 @@ export default function PeopleFeed() {
   }
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>People Feed</h1>
-        <p style={styles.subtitle}>
+    <div className="people-feed-container">
+      <header className="people-feed-header">
+        <h1 className="people-feed-title">People Feed</h1>
+        <p className="people-feed-subtitle">
           Discover study buddies who share your courses
         </p>
         {currentUserProfile && (
-          <div style={styles.userInfo}>
+          <div className="people-feed-user-info">
             <p>
               <strong>Your courses:</strong>{" "}
               {currentUserProfile.courses?.join(", ") || "None"}
@@ -450,7 +451,7 @@ export default function PeopleFeed() {
       </header>
 
       {rankedUsers.length === 0 ? (
-        <div style={styles.emptyState}>
+        <div className="people-feed-empty-state">
           <h2>No study buddies found</h2>
           <p>
             We couldn't find any users who share courses with you. Check back
@@ -459,7 +460,7 @@ export default function PeopleFeed() {
         </div>
       ) : (
         <>
-          <div style={styles.resultsInfo}>
+          <div className="people-feed-results-info">
             <p>
               Found <strong>{rankedUsers.length}</strong> study buddy
               {rankedUsers.length !== 1 ? "s" : ""}
@@ -467,7 +468,7 @@ export default function PeopleFeed() {
             </p>
           </div>
 
-          <div style={styles.feedContainer}>
+          <div className="people-feed-container-list">
             {rankedUsers.map((rankedUser) => (
               <ProfileCard
                 key={rankedUser.uid}
@@ -487,22 +488,31 @@ export default function PeopleFeed() {
 
       {/* Message Modal */}
       {showMessageModal && (
-        <div style={styles.modalOverlay} onClick={handleCancelMessage}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.modalHeader}>
+        <div
+          className="people-feed-modal-overlay"
+          onClick={handleCancelMessage}
+        >
+          <div
+            className="people-feed-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="people-feed-modal-header">
               <h3>Send Request to @{selectedUser?.username}</h3>
-              <button style={styles.closeButton} onClick={handleCancelMessage}>
+              <button
+                className="people-feed-close-button"
+                onClick={handleCancelMessage}
+              >
                 ×
               </button>
             </div>
 
-            <div style={styles.modalBody}>
-              <p style={styles.modalDescription}>
+            <div className="people-feed-modal-body">
+              <p className="people-feed-modal-description">
                 Write a personalized message to introduce yourself:
               </p>
 
               <textarea
-                style={styles.messageTextarea}
+                className="people-feed-message-textarea"
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
                 placeholder={`Hi @${selectedUser?.username}! I noticed we share some courses. Want to study together?`}
@@ -511,17 +521,20 @@ export default function PeopleFeed() {
                 autoFocus
               />
 
-              <div style={styles.characterCount}>
+              <div className="people-feed-character-count">
                 {customMessage.length}/500 characters
               </div>
             </div>
 
-            <div style={styles.modalActions}>
-              <button style={styles.cancelButton} onClick={handleCancelMessage}>
+            <div className="people-feed-modal-actions">
+              <button
+                className="people-feed-cancel-button"
+                onClick={handleCancelMessage}
+              >
                 Cancel
               </button>
               <button
-                style={styles.sendButton}
+                className="people-feed-send-button"
                 onClick={() => handleSendRequestWithMessage(customMessage)}
                 disabled={
                   !customMessage.trim() || loadingRequests[selectedUser?.uid]
@@ -538,187 +551,3 @@ export default function PeopleFeed() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: "800px",
-    margin: "0 auto",
-    padding: "20px",
-  },
-  loadingContainer: {
-    textAlign: "center",
-    padding: "60px 20px",
-  },
-  errorContainer: {
-    textAlign: "center",
-    padding: "40px 20px",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "32px",
-    paddingBottom: "20px",
-    borderBottom: "1px solid #e0e0e0",
-  },
-  subtitle: {
-    color: "#666",
-    fontSize: "16px",
-    margin: "8px 0 16px 0",
-  },
-  userInfo: {
-    backgroundColor: "#f8f9fa",
-    padding: "12px 16px",
-    borderRadius: "8px",
-    margin: "16px 0",
-    fontSize: "14px",
-  },
-  error: {
-    color: "red",
-    marginTop: "8px",
-  },
-  suggestion: {
-    marginTop: "16px",
-  },
-  link: {
-    color: "#007acc",
-    textDecoration: "none",
-    fontWeight: "500",
-  },
-  resultsInfo: {
-    textAlign: "center",
-    marginBottom: "24px",
-    color: "#555",
-  },
-  feedContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "60px 20px",
-    color: "#666",
-  },
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderRadius: "12px",
-    padding: "0",
-    maxWidth: "500px",
-    width: "90%",
-    maxHeight: "80vh",
-    overflow: "hidden",
-    boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
-  },
-  modalHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "20px 24px",
-    borderBottom: "1px solid #e0e0e0",
-    backgroundColor: "#f8f9fa",
-  },
-  closeButton: {
-    background: "none",
-    border: "none",
-    fontSize: "24px",
-    color: "#666",
-    cursor: "pointer",
-    padding: "0",
-    width: "30px",
-    height: "30px",
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalBody: {
-    padding: "24px",
-  },
-  modalDescription: {
-    color: "#666",
-    marginBottom: "16px",
-    fontSize: "14px",
-  },
-  messageTextarea: {
-    width: "100%",
-    minHeight: "100px",
-    padding: "12px",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontFamily: "inherit",
-    resize: "vertical",
-    outline: "none",
-    transition: "border-color 0.2s ease",
-  },
-  characterCount: {
-    fontSize: "12px",
-    color: "#666",
-    textAlign: "right",
-    marginTop: "8px",
-  },
-  modalActions: {
-    display: "flex",
-    gap: "12px",
-    justifyContent: "flex-end",
-    padding: "20px 24px",
-    borderTop: "1px solid #e0e0e0",
-    backgroundColor: "#f8f9fa",
-  },
-  cancelButton: {
-    padding: "10px 20px",
-    backgroundColor: "#6c757d",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-  sendButton: {
-    padding: "10px 20px",
-    backgroundColor: "#007acc",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-  },
-};
-
-// Add hover effects
-styles.closeButton[":hover"] = {
-  backgroundColor: "#f0f0f0",
-};
-
-styles.messageTextarea[":focus"] = {
-  borderColor: "#007acc",
-  boxShadow: "0 0 0 2px rgba(0, 122, 204, 0.2)",
-};
-
-styles.cancelButton[":hover"] = {
-  backgroundColor: "#5a6268",
-};
-
-styles.sendButton[":hover"] = {
-  backgroundColor: "#0056b3",
-};
-
-styles.sendButton[":disabled"] = {
-  backgroundColor: "#ccc",
-  cursor: "not-allowed",
-};
