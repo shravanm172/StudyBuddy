@@ -1,6 +1,7 @@
 // src/pages/RequestsPage.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "./RequestsPage.css";
 
 export default function RequestsPage() {
@@ -218,9 +219,7 @@ export default function RequestsPage() {
   if (loading) {
     return (
       <div className="requests-page-container">
-        <div className="requests-page-loading-container">
-          <p>Loading your requests...</p>
-        </div>
+        <LoadingSpinner message="Loading your requests..." />
       </div>
     );
   }

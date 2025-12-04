@@ -60,7 +60,9 @@ function MessageList({ messages = [], currentUserId, groupMembers = [] }) {
               <div className="message-avatar">
                 <div className="message-avatar-circle">
                   {getAvatarLetter(
-                    memberInfo.username || message.senderUsername || "Unknown User"
+                    memberInfo.username ||
+                      message.senderUsername ||
+                      "Unknown User"
                   )}
                 </div>
                 {memberInfo.role === "admin" && (
@@ -79,7 +81,9 @@ function MessageList({ messages = [], currentUserId, groupMembers = [] }) {
               {!isCurrentUser && showAvatar && (
                 <div className="message-header">
                   <span className="message-sender-name">
-                    {memberInfo.username || message.senderUsername || "Unknown User"}
+                    {memberInfo.username ||
+                      message.senderUsername ||
+                      "Unknown User"}
                   </span>
                   <span className="message-timestamp">
                     {formatMessageTime(message.timestamp)}

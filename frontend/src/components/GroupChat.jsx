@@ -47,11 +47,14 @@ function GroupChat({ groupId, groupMembers = [] }) {
 
       try {
         const token = await user.getIdToken();
-        const response = await fetch("http://localhost:5000/api/users/profile/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          "http://localhost:5000/api/users/profile/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -84,7 +87,11 @@ function GroupChat({ groupId, groupMembers = [] }) {
           }
         );
 
-        console.log('📡 Response received:', response.status, response.statusText);
+        console.log(
+          "📡 Response received:",
+          response.status,
+          response.statusText
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -165,7 +172,11 @@ function GroupChat({ groupId, groupMembers = [] }) {
       const messagesRef = collection(db, "groups", groupId, "messages");
       await addDoc(messagesRef, {
         senderId: user.uid,
-        senderUsername: currentUserProfile?.username || user.displayName || user.email || "Anonymous",
+        senderUsername:
+          currentUserProfile?.username ||
+          user.displayName ||
+          user.email ||
+          "Anonymous",
         content: content.trim(),
         timestamp: serverTimestamp(),
         type: "text",
@@ -189,7 +200,11 @@ function GroupChat({ groupId, groupMembers = [] }) {
         typingRef,
         {
           isTyping: true,
-          username: currentUserProfile?.username || user.displayName || user.email || "Anonymous",
+          username:
+            currentUserProfile?.username ||
+            user.displayName ||
+            user.email ||
+            "Anonymous",
           lastUpdate: serverTimestamp(),
         },
         { merge: true }

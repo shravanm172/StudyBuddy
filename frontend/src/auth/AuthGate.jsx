@@ -5,7 +5,7 @@ export default function AuthGate() {
   const { user, initializing } = useAuth();
   if (initializing) return <div style={{ padding: 24 }}>Loading…</div>;
   return user ? (
-    <Navigate to="/landing" replace />
+    <Navigate to="/groups" replace />
   ) : (
     <Navigate to="/login" replace />
   );

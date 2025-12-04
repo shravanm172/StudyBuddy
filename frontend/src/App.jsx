@@ -1,9 +1,9 @@
 // src/App.jsx
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthProvider";
 import ProtectedRoute from "./auth/ProtectedRoute";
+import Layout from "./components/Layout";
 import AuthPage from "./pages/AuthPage";
-import Landing from "./pages/Landing";
 import ProfilePage from "./pages/ProfilePage";
 import PeopleFeed from "./pages/PeopleFeed";
 import RequestsPage from "./pages/RequestsPage";
@@ -15,72 +15,72 @@ export default function App() {
   return (
     <AuthProvider>
       <Routes>
+        {/* Public routes - no layout */}
         <Route path="/" element={<AuthPage />} />
 
-        <Route
-          path="/landing"
-          element={
-            <ProtectedRoute>
-              <Landing />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/account"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/people"
-          element={
-            <ProtectedRoute>
-              <PeopleFeed />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/requests"
-          element={
-            <ProtectedRoute>
-              <RequestsPage />
-            </ProtectedRoute>
-          }
-        />
-
+        {/* Protected routes - with layout */}
         <Route
           path="/groups"
           element={
             <ProtectedRoute>
-              <MyGroupsPage />
+              <Layout />
             </ProtectedRoute>
           }
-        />
-
-        <Route
-          path="/groups/:groupId"
-          element={
-            <ProtectedRoute>
-              <GroupViewPage />
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route index element={<MyGroupsPage />} />
+          <Route path=":groupId" element={<GroupViewPage />} />
+        </Route>
 
         <Route
           path="/group-feed"
           element={
             <ProtectedRoute>
-              <GroupFeedPage />
+              <Layout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<GroupFeedPage />} />
+        </Route>
 
-        <Route path="*" element={<AuthPage />} />
+        <Route
+          path="/people"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<PeopleFeed />} />
+        </Route>
+
+        <Route
+          path="/requests"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<RequestsPage />} />
+        </Route>
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<ProfilePage />} />
+        </Route>
+
+        {/* Legacy route redirects */}
+        <Route path="/landing" element={<Navigate to="/groups" replace />} />
+        <Route path="/account" element={<Navigate to="/profile" replace />} />
+
+        {/* Catch all - redirect to auth */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>
   );

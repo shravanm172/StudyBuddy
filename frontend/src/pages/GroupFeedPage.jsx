@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { rankGroups } from "../utils/groupRankingEngine";
+import { HiRefresh } from "react-icons/hi";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "./GroupFeedPage.css";
 
 export default function GroupFeedPage() {
@@ -159,10 +161,7 @@ export default function GroupFeedPage() {
   if (loading) {
     return (
       <div className="group-feed-container">
-        <div className="group-feed-loading-container">
-          <h1>Group Feed</h1>
-          <p>Loading group recommendations...</p>
-        </div>
+        <LoadingSpinner message="Loading group recommendations..." />
       </div>
     );
   }
@@ -195,8 +194,9 @@ export default function GroupFeedPage() {
             className="group-feed-refresh-button"
             onClick={handleRefresh}
             disabled={loading}
+            title="Refresh groups"
           >
-            🔄 {loading ? "Refreshing..." : "Refresh"}
+            <HiRefresh />
           </button>
         </div>
       </div>
@@ -206,12 +206,12 @@ export default function GroupFeedPage() {
         <div className="group-feed-empty-state">
           <h2>No Groups Found</h2>
           <p>We couldn't find any public study groups for your courses.</p>
-          <p>Try enrolling in more courses or create your own study group!</p>
+          <p>Try connecting with study partners to create new groups!</p>
           <button
             className="group-feed-create-group-button"
-            onClick={() => navigate("/groups")}
+            onClick={() => navigate("/people")}
           >
-            Go to My Groups
+            Find Study Partners
           </button>
         </div>
       ) : (

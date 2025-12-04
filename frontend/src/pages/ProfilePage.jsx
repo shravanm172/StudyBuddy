@@ -6,6 +6,7 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "./ProfilePage.css";
 
 export default function ProfilePage() {
@@ -149,7 +150,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="profile-page-container">
-        <p>Loading profile…</p>
+        <LoadingSpinner message="Loading profile..." />
       </div>
     );
   }

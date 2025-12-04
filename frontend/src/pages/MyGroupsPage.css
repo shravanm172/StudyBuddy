@@ -23,6 +23,39 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
+.my-groups-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.my-groups-refresh-button {
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 0.8rem;
+  padding: 1rem;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  min-width: 4.5rem;
+  min-height: 4.5rem;
+}
+
+.my-groups-refresh-button:hover:not(:disabled) {
+  background: #5568d3;
+  transform: rotate(180deg);
+}
+
+.my-groups-refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .my-groups-title {
   font-size: 2.5rem;
   color: #333;

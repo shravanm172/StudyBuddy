@@ -30,7 +30,7 @@ export default function AuthPage() {
   const nav = useNavigate();
 
   useEffect(() => {
-    if (user) nav("/landing", { replace: true });
+    if (user) nav("/groups", { replace: true });
   }, [user, nav]);
 
   // Load enums from backend

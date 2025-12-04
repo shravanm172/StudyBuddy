@@ -1,4 +1,4 @@
-// src/pages/Landing.jsx
+// This is the main index landing page after a user logs in
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";

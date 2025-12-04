@@ -1,8 +1,8 @@
-// src/pages/PeopleFeed.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import ProfileCard from "../components/ProfileCard";
 import { rankUsers } from "../utils/peopleRankingEngine";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "./PeopleFeed.css";
 
 export default function PeopleFeed() {
@@ -242,9 +242,9 @@ export default function PeopleFeed() {
   };
 
   const handleViewProfile = (targetUser) => {
-    // For now, just log the user - you can implement a modal or navigation later
+    // TODO: Need to implement profile viewing functionality
     console.log("View profile for user:", targetUser);
-    alert(`Viewing profile for @${targetUser.username}`);
+    // alert(`Viewing profile for @${targetUser.username}`);
   };
 
   const handleSendRequest = (targetUser) => {
@@ -406,9 +406,7 @@ export default function PeopleFeed() {
   if (loading) {
     return (
       <div className="people-feed-container">
-        <div className="people-feed-loading-container">
-          <p>Loading recommendations...</p>
-        </div>
+        <LoadingSpinner message="Loading recommendations..." />
       </div>
     );
   }

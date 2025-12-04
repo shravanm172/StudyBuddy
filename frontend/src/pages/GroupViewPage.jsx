@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  HiRefresh,
+  HiPencil,
+  HiCheckCircle,
+  HiExclamationCircle,
+} from "react-icons/hi";
 import GroupChat from "../components/GroupChat";
 import "./GroupViewPage.css";
 
@@ -22,7 +28,7 @@ function GroupViewPage() {
   // Group join request management
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
-  const [showRequestsSection, setShowRequestsSection] = useState(false);
+  const [showRequestsSection, setShowRequestsSection] = useState(true); // Auto-show for admins
 
   // Group editing state
   const [editingName, setEditingName] = useState(false);
@@ -52,14 +58,10 @@ function GroupViewPage() {
 
   // Load pending requests when user becomes admin and requests section is open
   useEffect(() => {
-    if (
-      currentUserRole === "admin" &&
-      showRequestsSection &&
-      !loadingRequests
-    ) {
+    if (currentUserRole === "admin" && !loadingRequests) {
       loadPendingRequests();
     }
-  }, [currentUserRole, showRequestsSection]);
+  }, [currentUserRole]);
 
   // Load available courses for course management
   useEffect(() => {
@@ -576,10 +578,10 @@ function GroupViewPage() {
 
   // Load pending requests when admin opens the requests section
   useEffect(() => {
-    if (showRequestsSection && currentUserRole === "admin") {
+    if (currentUserRole === "admin") {
       loadPendingRequests();
     }
-  }, [showRequestsSection, currentUserRole, groupId, user]);
+  }, [currentUserRole, groupId, user]);
 
   const getRoleBadgeClass = (role) => {
     if (role === "admin") {
@@ -688,7 +690,7 @@ function GroupViewPage() {
                     className="group-view-edit-name-button"
                     title="Edit group name"
                   >
-                    ✏️
+                    <HiPencil />
                   </button>
                 )}
               </div>
@@ -746,7 +748,7 @@ function GroupViewPage() {
                   className="group-view-edit-description-button"
                   title="Edit group description"
                 >
-                  ✏️
+                  <HiPencil />
                 </button>
               )}
             </div>
@@ -778,7 +780,7 @@ function GroupViewPage() {
       {/* Courses Section */}
       <div className="group-view-courses-section">
         <div className="group-view-courses-section-header">
-          <h2 className="group-view-section-title">Study Courses</h2>
+          <h2 className="group-view-section-title">Studied Courses</h2>
           {currentUserRole === "admin" && (
             <button
               className="group-view-add-course-button"
@@ -964,13 +966,14 @@ function GroupViewPage() {
             {(!group.courses || group.courses.length === 0) &&
               !group.is_visible && (
                 <p className="group-view-warning-note">
-                  ⚠️ Add at least one course to make this group discoverable on
-                  the public feed.
+                  <HiExclamationCircle /> Add at least one course to make this
+                  group discoverable on the public feed.
                 </p>
               )}
             {group.is_visible && (
               <p className="group-view-success-note">
-                ✅ This group is visible on the public feed - students studying{" "}
+                <HiCheckCircle /> This group is visible on the public feed -
+                students studying{" "}
                 {group.courses?.map((c) => c.course_id).join(", ")} can discover
                 it!
               </p>
@@ -984,37 +987,18 @@ function GroupViewPage() {
             <div className="group-view-section-header">
               <h2 className="group-view-section-title">Join Requests</h2>
               <div className="group-view-header-buttons">
-                {showRequestsSection && (
-                  <button
-                    className="group-view-refresh-button"
-                    onClick={loadPendingRequests}
-                    disabled={loadingRequests}
-                    title="Refresh requests"
-                  >
-                    🔄
-                  </button>
-                )}
                 <button
-                  className="group-view-toggle-button"
-                  onClick={() => {
-                    if (!showRequestsSection) {
-                      // Load requests when opening the section
-                      loadPendingRequests();
-                    }
-                    setShowRequestsSection(!showRequestsSection);
-                  }}
+                  className="group-view-refresh-button"
+                  onClick={loadPendingRequests}
                   disabled={loadingRequests}
+                  title="Refresh requests"
                 >
-                  {loadingRequests
-                    ? "Loading..."
-                    : showRequestsSection
-                    ? "Hide Requests"
-                    : "Manage Requests"}
+                  <HiRefresh />
                 </button>
               </div>
             </div>
 
-            {showRequestsSection && (
+            {
               <div className="group-view-requests-container">
                 {loadingRequests ? (
                   <p className="group-view-loading-text">
@@ -1117,7 +1101,7 @@ function GroupViewPage() {
                   </div>
                 )}
               </div>
-            )}
+            }
           </div>
         )}
 

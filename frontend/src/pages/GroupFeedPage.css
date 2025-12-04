@@ -39,20 +39,29 @@
 }
 
 .group-feed-refresh-button {
-  padding: 10px 20px;
-  background-color: #007acc;
+  background: #667eea;
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: 0.8rem;
+  padding: 1rem;
+  font-size: 2rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  min-width: 4.5rem;
+  min-height: 4.5rem;
 }
 
-.group-feed-refresh-button:hover {
-  background-color: #0056b3;
+.group-feed-refresh-button:hover:not(:disabled) {
+  background: #5568d3;
+  transform: rotate(180deg);
+}
+
+.group-feed-refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .group-feed-refresh-button:disabled {

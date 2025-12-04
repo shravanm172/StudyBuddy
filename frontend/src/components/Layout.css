@@ -1,0 +1,39 @@
+.app-layout {
+  min-height: 100vh;
+  background: #f7fafc;
+}
+
+.main-content {
+  display: flex;
+  padding-top: 6rem; /* Height of TopBar */
+  background: #f7fafc; /* Match background */
+}
+
+.page-content {
+  position: fixed;
+  left: 24rem; /* Start after sidebar */
+  top: 6rem; /* Start after topbar */
+  width: calc(100vw - 24rem); /* Full width minus sidebar */
+  height: calc(100vh - 6rem); /* Full height minus topbar */
+  overflow-y: auto; /* Allow scrolling */
+  background: #f7fafc;
+  display: flex;
+  justify-content: center; /* Center the wrapper */
+  align-items: flex-start;
+  color: #1a202c; /* Dark text for contrast */
+}
+
+.page-content-wrapper {
+  width: 100%;
+  max-width: 120rem; /* Maximum width for content */
+  padding: 3rem; /* Inner padding for the content */
+  color: #1a202c; /* Ensure text is dark */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .page-content {
+    margin-left: 0;
+    padding: 2rem 1rem;
+  }
+}

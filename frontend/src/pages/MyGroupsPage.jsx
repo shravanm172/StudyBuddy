@@ -1,7 +1,8 @@
-// src/pages/MyGroupsPage.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { HiUsers, HiRefresh } from "react-icons/hi";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "./MyGroupsPage.css";
 
 export default function MyGroupsPage() {
@@ -96,9 +97,7 @@ export default function MyGroupsPage() {
   if (loading) {
     return (
       <div className="my-groups-container">
-        <div className="my-groups-loading-container">
-          <p>Loading your groups...</p>
-        </div>
+        <LoadingSpinner message="Loading your groups..." />
       </div>
     );
   }
@@ -119,10 +118,22 @@ export default function MyGroupsPage() {
   return (
     <div className="my-groups-container">
       <header className="my-groups-header">
-        <h1 className="my-groups-title">My Study Groups</h1>
-        <p className="my-groups-subtitle">
-          Manage your study groups and collaborate with your study buddies
-        </p>
+        <div className="my-groups-header-content">
+          <div>
+            <h1 className="my-groups-title">My Study Groups</h1>
+            {/* <p className="my-groups-subtitle">
+              Manage your study groups and collaborate with your study buddies
+            </p> */}
+          </div>
+          <button
+            className="my-groups-refresh-button"
+            onClick={refreshGroups}
+            disabled={loading}
+            title="Refresh groups"
+          >
+            <HiRefresh />
+          </button>
+        </div>
       </header>
 
       {groups.length === 0 ? (
@@ -160,7 +171,7 @@ export default function MyGroupsPage() {
                   </div>
                   <div className="my-groups-card-meta">
                     <span className="my-groups-member-count">
-                      👥 {group.member_count} member
+                      <HiUsers /> {group.member_count} member
                       {group.member_count !== 1 ? "s" : ""}
                     </span>
                   </div>
