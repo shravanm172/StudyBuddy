@@ -5,6 +5,37 @@ from app.models.user import Course
 # Create Blueprint
 bp = Blueprint('courses', __name__, url_prefix='/api/courses')
 
+@bp.route("/available/", methods=["GET", "OPTIONS"])
+def get_available_courses():
+    """Get all available courses - public endpoint for signup page"""
+    
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    print("📚 === GET AVAILABLE COURSES (PUBLIC) ===")
+    
+    try:
+        courses = Course.query.all()
+        
+        course_list = [
+            {
+                "course_id": course.course_id,
+                "title": course.title
+            }
+            for course in courses
+        ]
+        
+        print(f"✅ Found {len(course_list)} available courses")
+        return jsonify({
+            "courses": course_list
+        }), 200
+        
+    except Exception as e:
+        print(f"💥 Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 @bp.route("/", methods=["GET", "OPTIONS"])
 def get_courses():
     """Get all available courses"""

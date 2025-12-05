@@ -5,8 +5,8 @@ from app.models.user import Course
 COURSES = [
     ("CSE1001", "Intro to Programming"),
     ("CSE2010", "Data Structures"),
-    ("CSE3002", "Algorithms"),
-    ("CSE4001", "Software Engineering"),
+    ("CSE2410", "Software Engineering"),
+    ("CSE4001", "Operating Systems"),
     ("PHY2002", "Physics II"),
 ]
 

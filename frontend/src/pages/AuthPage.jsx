@@ -20,6 +20,10 @@ export default function AuthPage() {
   const [enums, setEnums] = useState({ grades: [], genders: [] });
   const [enumsLoading, setEnumsLoading] = useState(false);
 
+  // available courses from backend
+  const [availableCourses, setAvailableCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(false);
+
   // username validation
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [usernameChecking, setUsernameChecking] = useState(false);
@@ -55,6 +59,32 @@ export default function AuthPage() {
     }
 
     loadEnums();
+  }, [mode]);
+
+  // Load available courses from backend
+  useEffect(() => {
+    async function loadCourses() {
+      if (mode !== "signup") return;
+
+      setCoursesLoading(true);
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/courses/available/"
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableCourses(data.courses);
+        } else {
+          console.error("Failed to load courses");
+        }
+      } catch (error) {
+        console.error("Error loading courses:", error);
+      } finally {
+        setCoursesLoading(false);
+      }
+    }
+
+    loadCourses();
   }, [mode]);
 
   // check username availability
@@ -251,33 +281,39 @@ export default function AuthPage() {
             </select>
 
             <div className="course-box">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={courses.includes("CSE2010")}
-                  onChange={() => toggleCourse("CSE2010")}
-                  disabled={submitting}
-                />{" "}
-                CSE2010
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={courses.includes("CSE4001")}
-                  onChange={() => toggleCourse("CSE4001")}
-                  disabled={submitting}
-                />{" "}
-                CSE4001
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={courses.includes("PHY2002")}
-                  onChange={() => toggleCourse("PHY2002")}
-                  disabled={submitting}
-                />{" "}
-                PHY2002
-              </label>
+              {coursesLoading ? (
+                <p
+                  style={{
+                    gridColumn: "1 / -1",
+                    textAlign: "center",
+                    color: "#666",
+                  }}
+                >
+                  Loading courses...
+                </p>
+              ) : availableCourses.length > 0 ? (
+                availableCourses.map((course) => (
+                  <label key={course.course_id}>
+                    <input
+                      type="checkbox"
+                      checked={courses.includes(course.course_id)}
+                      onChange={() => toggleCourse(course.course_id)}
+                      disabled={submitting}
+                    />{" "}
+                    {course.course_id} - {course.title}
+                  </label>
+                ))
+              ) : (
+                <p
+                  style={{
+                    gridColumn: "1 / -1",
+                    textAlign: "center",
+                    color: "#999",
+                  }}
+                >
+                  No courses available
+                </p>
+              )}
             </div>
           </>
         )}
