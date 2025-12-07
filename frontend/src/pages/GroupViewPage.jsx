@@ -1,3 +1,9 @@
+/*
+ * Group view page with member management and real-time chat.
+ * Admins can edit group details, manage members, and handle join requests.
+ * Includes live chat functionality via Firebase.
+ */
+
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate, useParams } from "react-router-dom";
@@ -25,12 +31,10 @@ function GroupViewPage() {
   const [availableCourses, setAvailableCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState("");
 
-  // Group join request management
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
-  const [showRequestsSection, setShowRequestsSection] = useState(true); // Auto-show for admins
+  const [showRequestsSection, setShowRequestsSection] = useState(true);
 
-  // Group editing state
   const [editingName, setEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [savingName, setSavingName] = useState(false);
@@ -38,7 +42,6 @@ function GroupViewPage() {
   const [editedDescription, setEditedDescription] = useState("");
   const [savingDescription, setSavingDescription] = useState(false);
 
-  // Group chat state
   const [showChatSection, setShowChatSection] = useState(false);
 
   // Load group details and members
@@ -56,7 +59,6 @@ function GroupViewPage() {
     loadGroupData();
   }, [user, groupId]);
 
-  // Load pending requests when user becomes admin and requests section is open
   useEffect(() => {
     if (currentUserRole === "admin" && !loadingRequests) {
       loadPendingRequests();
@@ -110,7 +112,6 @@ function GroupViewPage() {
         const data = await response.json();
         console.log("Group API response:", data); // Debug log
 
-        // Extract group data from the wrapper
         const groupData = data.group || data;
         setGroup(groupData);
 
@@ -393,7 +394,6 @@ function GroupViewPage() {
       if (response.ok) {
         const data = await response.json();
         setPendingRequests(data.requests || []);
-        console.log(`📥 Loaded ${data.requests?.length || 0} pending requests`);
       } else {
         const errorData = await response.json();
         console.error("Failed to load pending requests:", errorData);
@@ -493,14 +493,10 @@ function GroupViewPage() {
       );
 
       if (response.ok) {
-        console.log("✅ Group name updated successfully");
-
-        // Update local state
         setGroup((prev) => ({ ...prev, name: trimmedName }));
         setEditingName(false);
         setEditedName("");
 
-        // Show success message
         alert("Group name updated successfully!");
       } else {
         const errorData = await response.json();
@@ -532,7 +528,6 @@ function GroupViewPage() {
     const trimmedDescription = editedDescription.trim();
 
     if (trimmedDescription === (group.description || "")) {
-      // No change, just cancel editing
       cancelEditingDescription();
       return;
     }
@@ -554,14 +549,10 @@ function GroupViewPage() {
       );
 
       if (response.ok) {
-        console.log("✅ Group description updated successfully");
-
-        // Update local state
         setGroup((prev) => ({ ...prev, description: trimmedDescription }));
         setEditingDescription(false);
         setEditedDescription("");
 
-        // Show success message
         alert("Group description updated successfully!");
       } else {
         const errorData = await response.json();
@@ -576,7 +567,7 @@ function GroupViewPage() {
     }
   };
 
-  // Load pending requests when admin opens the requests section
+  // Load pending requests
   useEffect(() => {
     if (currentUserRole === "admin") {
       loadPendingRequests();

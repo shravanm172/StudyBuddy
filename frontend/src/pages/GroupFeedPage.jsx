@@ -1,9 +1,14 @@
-// src/pages/GroupFeedPage.jsx
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { rankGroups } from "../utils/groupRankingEngine";
-import { HiRefresh } from "react-icons/hi";
+import {
+  HiRefresh,
+  HiUsers,
+  HiCalendar,
+  HiLockOpen,
+  HiLockClosed,
+} from "react-icons/hi";
 import LoadingSpinner from "../components/LoadingSpinner";
 import "./GroupFeedPage.css";
 
@@ -12,7 +17,7 @@ export default function GroupFeedPage() {
   const navigate = useNavigate();
 
   const [userCourses, setUserCourses] = useState([]);
-  const [groups, setGroups] = useState([]); // This will store the ranked groups
+  const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [lastRefresh, setLastRefresh] = useState(Date.now());
@@ -27,7 +32,6 @@ export default function GroupFeedPage() {
     try {
       setLoading(true);
       setError("");
-      console.log("🔍 Starting group feed request...");
       const token = await user.getIdToken();
 
       const response = await fetch(`http://localhost:5000/api/groups/feed/`, {
@@ -38,11 +42,10 @@ export default function GroupFeedPage() {
         },
       });
 
-      console.log("📡 Response status:", response.status);
+      console.log("Response status:", response.status);
 
       if (response.ok) {
         const data = await response.json();
-        console.log("📊 Group feed data:", data);
 
         const userCourses = data.user_courses || [];
         const groups = data.groups || [];
@@ -50,18 +53,16 @@ export default function GroupFeedPage() {
         setUserCourses(userCourses);
 
         // Use ranking engine to sort the groups
-        console.log("🎯 Ranking groups with user courses:", userCourses);
+        console.log("Ranking groups with user courses:", userCourses);
         const rankedGroups = rankGroups(userCourses, groups);
-        console.log("📈 Ranked groups:", rankedGroups);
-
-        setGroups(rankedGroups); // Store the ranked groups
+        setGroups(rankedGroups); //store ranked groups
       } else {
         const errorData = await response.json();
-        console.error("❌ API Error:", errorData);
+        console.error("API Error:", errorData);
         setError(errorData.error || "Failed to load group recommendations.");
       }
     } catch (err) {
-      console.error("💥 Failed to load group feed:", err);
+      console.error("Failed to load group feed:", err);
       setError("Failed to load group feed. Please try again.");
     } finally {
       setLoading(false);
@@ -84,7 +85,6 @@ export default function GroupFeedPage() {
     }
 
     try {
-      console.log(`🚪 Requesting to join group ${groupId} (${groupName})`);
       const token = await user.getIdToken();
 
       const response = await fetch(
@@ -102,26 +102,25 @@ export default function GroupFeedPage() {
         }
       );
 
-      console.log("📡 Join request response status:", response.status);
+      console.log("Join request response status:", response.status);
 
       if (response.ok) {
         const data = await response.json();
-        console.log("📊 Join request data:", data);
+        console.log("Join request data:", data);
 
         if (data.auto_accepted) {
           alert(
-            `🎉 Successfully joined ${groupName}! You were automatically added to this public group.`
+            `Successfully joined ${groupName}! You were automatically added to this public group.`
           );
-          // Refresh the feed to remove the group from the list
           handleRefresh();
         } else {
           alert(
-            `📝 Join request sent for ${groupName}! Wait for admin approval.`
+            `Join request sent for ${groupName}! Pending admin approval for this private group.`
           );
         }
       } else {
         const errorData = await response.json();
-        console.error("❌ Join request error:", errorData);
+        console.error("Join request error:", errorData);
 
         if (errorData.error.includes("already a member")) {
           alert(`You're already a member of ${groupName}!`);
@@ -134,7 +133,7 @@ export default function GroupFeedPage() {
         }
       }
     } catch (err) {
-      console.error("💥 Join request failed:", err);
+      console.error("Join request failed:", err);
       alert(`Failed to send join request for ${groupName}. Please try again.`);
     }
   };
@@ -268,14 +267,19 @@ export default function GroupFeedPage() {
               {/* Group Info */}
               <div className="group-feed-group-info">
                 <span className="group-feed-group-info-item">
-                  👥 {group.member_count} member
+                  <HiUsers /> {group.member_count} member
                   {group.member_count !== 1 ? "s" : ""}
                 </span>
                 <span className="group-feed-group-info-item">
-                  📅 Created {formatDate(group.created_at)}
+                  <HiCalendar /> Created {formatDate(group.created_at)}
                 </span>
                 <span className="group-feed-group-info-item">
-                  🔓 {group.privacy === "public" ? "Public" : "Private"} Group
+                  {group.privacy === "public" ? (
+                    <HiLockOpen />
+                  ) : (
+                    <HiLockClosed />
+                  )}{" "}
+                  {group.privacy === "public" ? "Public" : "Private"} Group
                 </span>
               </div>
             </div>

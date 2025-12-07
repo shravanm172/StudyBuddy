@@ -1,4 +1,5 @@
-// src/pages/RequestsPage.jsx
+// Manages incoming and outgoing study buddy requests with accept, reject, and cancel actions.
+
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -11,9 +12,8 @@ export default function RequestsPage() {
   const [outgoingRequests, setOutgoingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [loadingActions, setLoadingActions] = useState({}); // Track loading state for individual actions
+  const [loadingActions, setLoadingActions] = useState({});
 
-  // Load all requests on component mount
   useEffect(() => {
     async function loadAllRequests() {
       if (!user) {
@@ -28,7 +28,6 @@ export default function RequestsPage() {
     loadAllRequests();
   }, [user]);
 
-  // Add periodic refresh every 15 seconds
   useEffect(() => {
     if (!user) return;
 
@@ -104,7 +103,7 @@ export default function RequestsPage() {
 
       if (response.ok) {
         alert("Request accepted! You're now connected.");
-        await refreshAllRequests(); // Refresh to show updated status
+        await refreshAllRequests();
       } else {
         console.error("Failed to accept request:", data);
         alert(`Failed to accept request: ${data.error}`);
@@ -187,7 +186,6 @@ export default function RequestsPage() {
     }
   };
 
-  // Sort requests: pending first, then by date
   const sortRequests = (requests) => {
     return [...requests].sort((a, b) => {
       // Pending requests first

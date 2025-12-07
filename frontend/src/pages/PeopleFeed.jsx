@@ -1,3 +1,9 @@
+/*
+ * Displays ranked list of potential study partners
+ * Handles direct request sending, accepting, and rejecting from People Feed
+ * TODO: Implement profile viewing functionality
+ */
+
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import ProfileCard from "../components/ProfileCard";
@@ -13,14 +19,13 @@ export default function PeopleFeed() {
   const [rankedUsers, setRankedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [requestStates, setRequestStates] = useState({}); // Track request status for each user
-  const [loadingRequests, setLoadingRequests] = useState({}); // Track loading state for requests
-  const [incomingRequests, setIncomingRequests] = useState({}); // Track incoming requests by sender UID
+  const [requestStates, setRequestStates] = useState({});
+  const [loadingRequests, setLoadingRequests] = useState({});
+  const [incomingRequests, setIncomingRequests] = useState({});
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [customMessage, setCustomMessage] = useState("");
 
-  // Load current user profile and all other users
   useEffect(() => {
     async function loadData() {
       setLoading(true);
@@ -103,7 +108,7 @@ export default function PeopleFeed() {
   // Load existing request states for the ranked users
   const loadRequestStates = async (token, users) => {
     try {
-      // Get outgoing requests to see who we've already sent requests to
+      // Get outgoing requests to see who user already sent requests to
       const outgoingRes = await fetch(
         "http://localhost:5000/api/requests/outgoing/",
         {
@@ -124,7 +129,7 @@ export default function PeopleFeed() {
         setRequestStates(states);
       }
 
-      // Get pending incoming requests to see who has sent requests to us that we need to respond to
+      // Get pending incoming requests to see who has sent requests to user that user need to respond to
       const incomingPendingRes = await fetch(
         "http://localhost:5000/api/requests/incoming/?status=pending",
         {
@@ -139,13 +144,12 @@ export default function PeopleFeed() {
         const incoming = {};
 
         incomingPendingData.requests?.forEach((request) => {
-          incoming[request.sender_uid] = request.id; // Store request ID for accept/reject
+          incoming[request.sender_uid] = request.id;
         });
 
         setIncomingRequests(incoming);
       }
 
-      // Get accepted incoming requests to properly track connections
       const incomingAcceptedRes = await fetch(
         "http://localhost:5000/api/requests/incoming/?status=accepted",
         {
@@ -188,15 +192,12 @@ export default function PeopleFeed() {
         setRequestStates((prev) => {
           const newStates = { ...prev };
 
-          // For each user with "accepted" status, check if we're still in groups together
+          // For each user with "accepted" status, check if still in groups together
           Object.keys(newStates).forEach((userUid) => {
             if (newStates[userUid] === "accepted") {
-              // If we're no longer in any groups together, reset to null (show "Send Request")
+              // If user no longer in any groups together, reset to null
               if (!usersInGroupsWith.has(userUid)) {
                 delete newStates[userUid]; // Remove the status entirely
-                console.log(
-                  `🔄 Reset status for ${userUid}: no longer in groups together`
-                );
               }
             }
           });
@@ -206,7 +207,6 @@ export default function PeopleFeed() {
       }
     } catch (err) {
       console.error("Failed to load request states:", err);
-      // Don't show error to user, just continue without request state info
     }
   };
 
@@ -243,12 +243,11 @@ export default function PeopleFeed() {
 
   const handleViewProfile = (targetUser) => {
     // TODO: Need to implement profile viewing functionality
-    console.log("View profile for user:", targetUser);
     // alert(`Viewing profile for @${targetUser.username}`);
   };
 
   const handleSendRequest = (targetUser) => {
-    // Open the message modal instead of sending immediately
+    // Add customizable message to request
     setSelectedUser(targetUser);
     setCustomMessage(
       `Hi @${targetUser.username}! I noticed we share some courses. Want to study together?`
@@ -379,8 +378,6 @@ export default function PeopleFeed() {
       const data = await response.json();
 
       if (response.ok) {
-        // Remove from incoming requests - don't update requestStates for sender
-        // This way the sender won't see "rejected" status
         setIncomingRequests((prev) => {
           const newState = { ...prev };
           delete newState[senderUser.uid];

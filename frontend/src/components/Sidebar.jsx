@@ -1,3 +1,8 @@
+/*
+ * Navigation sidebar with icon menu for main app sections.
+ * Highlights active route using NavLink.
+ */
+
 import { NavLink } from "react-router-dom";
 import { HiHome, HiSearch, HiUsers, HiInbox, HiCog } from "react-icons/hi";
 import "./Sidebar.css";

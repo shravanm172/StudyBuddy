@@ -1,20 +1,13 @@
-// src/utils/groupRankingEngine.js
-
 /**
- * StudyBuddy Group Ranking Engine
+ * StudyBuddy Group Ranking Engine for Group Feed
  * 
- * Simple ranking algorithm that ranks groups by the number of shared courses
- * with the user. Groups with more shared courses are ranked higher.
+ * For now, simple ranking algorithm that ranks groups by the number of shared courses with the user. 
  * 
  * RANKING ALGORITHM:
- * ==================
  * Groups are sorted by the count of courses they share with the user.
  * Higher shared course count = higher ranking.
  */
 
-/**
- * Get shared courses between user and group
- */
 export function getSharedCoursesWithGroup(userCourses, group) {
   if (!userCourses || !group || !group.courses) return [];
   
@@ -22,9 +15,6 @@ export function getSharedCoursesWithGroup(userCourses, group) {
   return userCourses.filter(course => groupCourseIds.includes(course));
 }
 
-/**
- * Rank groups based on number of shared courses with user
- */
 export function rankGroups(userCourses, groups) {
   if (!userCourses || !groups || groups.length === 0) return [];
   

@@ -1,3 +1,9 @@
+/*
+ * Manages Firebase authentication state and user session lifecycle.
+ * Provides login, signup, and logout methods via React context.
+ * Coordinates Firebase auth with backend Postgres user profiles.
+ */
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "./firebase";
 import {
@@ -25,41 +31,34 @@ export function AuthProvider({ children }) {
   const login = (email, password) =>
     signInWithEmailAndPassword(auth, email, password);
 
-  // ✅ Signup that also creates the Postgres profile, with server verification
+  // Creates Firebase user and corresponding Postgres profile with server verification
   const signup = async (email, password, profile) => {
-    // profile = { age, grade, school, gender, courses: [...] }
     if (!profile?.courses?.length) {
       throw new Error("Please select at least one course.");
     }
 
-    // 1) Create Firebase user
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     const u = cred.user;
 
+    // Set display name as email address
     try {
-      // 2) (Optional) set display name; don’t fail signup if this fails
       try {
         await updateProfile(u, { displayName: email });
-      } catch {
-        /* non-fatal */
-      }
+      } catch {}
 
-      // 3) Get ID token for backend verification (important!)
+      // Get ID token for backend verification
       const idToken = await u.getIdToken();
       console.log(
-        "🔑 Firebase ID Token obtained:",
+        "Firebase ID Token obtained:",
         idToken.substring(0, 20) + "..."
       );
 
-      // 4) Tell backend to create Postgres profile.
+      // Tell backend to create Postgres profile.
       const payload = {
         uid: u.uid,
         email: u.email,
         ...profile, // date_of_birth, grade, gender, courses
       };
-
-      console.log("📤 Sending payload to backend:", payload);
-      console.log("🌐 Making request to: http://localhost:5000/api/users/");
 
       const res = await fetch("http://localhost:5000/api/users/", {
         method: "POST",
@@ -71,30 +70,28 @@ export function AuthProvider({ children }) {
         body: JSON.stringify(payload),
       });
 
-      console.log("📥 Response status:", res.status);
-      console.log("📥 Response ok:", res.ok);
+      console.log(" Response status:", res.status);
+      console.log(" Response ok:", res.ok);
 
       if (!res.ok) {
         let errorMsg;
         try {
           const errorData = await res.json();
           errorMsg = errorData.error || errorData.message || "Unknown error";
-          console.log("❌ Backend error response:", errorData);
+          console.log("Backend error:", errorData);
         } catch {
           errorMsg = await res.text();
-          console.log("❌ Backend error text:", errorMsg);
+          console.log("Backend error text:", errorMsg);
         }
         throw new Error(`Backend error (${res.status}): ${errorMsg}`);
       }
 
       const responseData = await res.json();
-      console.log("✅ Backend success response:", responseData);
+      console.log("User created successfully:", responseData);
 
-      // Optional: avoid UI flash before onAuthStateChanged fires
       setUser(u);
       return u;
     } catch (err) {
-      // Single rollback to avoid double-delete USER_NOT_FOUND noise
       try {
         await u.delete();
       } catch {

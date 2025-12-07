@@ -1,3 +1,8 @@
+/*
+ * Displays chat messages with timestamps and user info.
+ * Handles message formatting and member profile lookups.
+ */
+
 import { formatDistanceToNow } from "date-fns";
 import "./MessageList.css";
 

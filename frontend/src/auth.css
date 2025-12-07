@@ -107,15 +107,14 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.95rem;
-  color: #333; /* This controls the checkbox text color */
+  color: #333;
   cursor: pointer;
 }
 
 .course-box label:hover {
-  color: #5a5bef; /* Optional: hover effect for text */
+  color: #5a5bef;
 }
 
-/* Style the actual checkbox */
 .course-box input[type="checkbox"] {
-  accent-color: #5a5bef; /* Modern way to style checkbox color */
+  accent-color: #5a5bef;
 }

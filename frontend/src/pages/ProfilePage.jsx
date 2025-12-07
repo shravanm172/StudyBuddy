@@ -1,4 +1,7 @@
-// src/pages/ProfilePage.jsx
+/*
+  User profile management page with editable fields and password change functionality.
+*/
+
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import {
@@ -24,11 +27,9 @@ export default function ProfilePage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // NEW: dynamic enums from backend
   const [enums, setEnums] = useState({ grades: [], genders: [] });
   const [enumsLoading, setEnumsLoading] = useState(false);
 
-  // ---- Load profile and enums on mount ----
   useEffect(() => {
     async function loadData() {
       setLoading(true);
@@ -42,7 +43,6 @@ export default function ProfilePage() {
       }
 
       try {
-        // Load enums first
         setEnumsLoading(true);
         const enumsResponse = await fetch(
           "http://localhost:5000/api/users/enums/"
@@ -53,7 +53,6 @@ export default function ProfilePage() {
         }
         setEnumsLoading(false);
 
-        // Load profile
         const token = await user.getIdToken();
         const res = await fetch("http://localhost:5000/api/users/me/", {
           headers: {
@@ -62,7 +61,6 @@ export default function ProfilePage() {
         });
 
         if (res.status === 404) {
-          // No profile yet – leave form empty
           setSuccess("No profile found yet. Fill out your details below.");
           setLoading(false);
           return;
@@ -75,7 +73,7 @@ export default function ProfilePage() {
         } else {
           setForm({
             username: data.username || "",
-            date_of_birth: data.date_of_birth || "", // ISO string yyyy-mm-dd
+            date_of_birth: data.date_of_birth || "",
             grade: data.grade || "",
             gender: data.gender || "",
             coursesText: (data.courses || []).join(", "),
@@ -97,7 +95,6 @@ export default function ProfilePage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  // ---- Save profile (PUT) ----
   async function handleSave(e) {
     e.preventDefault();
     setSaving(true);
@@ -258,8 +255,6 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-// ---- Change Password (Firebase only) ----
 
 function ChangePasswordSection() {
   const { user } = useAuth();

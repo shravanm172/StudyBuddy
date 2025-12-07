@@ -1,3 +1,4 @@
+// Base layout template with top bar header and sidebar menu
 import { Outlet } from "react-router-dom";
 import TopBar from "./TopBar";
 import Sidebar from "./Sidebar";

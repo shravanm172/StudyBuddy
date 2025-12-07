@@ -1,4 +1,3 @@
-// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthProvider";
 import ProtectedRoute from "./auth/ProtectedRoute";
@@ -75,11 +74,9 @@ export default function App() {
           <Route index element={<ProfilePage />} />
         </Route>
 
-        {/* Legacy route redirects */}
         <Route path="/landing" element={<Navigate to="/groups" replace />} />
         <Route path="/account" element={<Navigate to="/profile" replace />} />
 
-        {/* Catch all - redirect to auth */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>

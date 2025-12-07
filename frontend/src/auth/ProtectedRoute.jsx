@@ -1,4 +1,4 @@
-// src/auth/ProtectedRoute.jsx
+// ProtectedRoute provides individual route protection for authenticated users
 import { Navigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 
@@ -10,10 +10,10 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!user) {
-    // Not logged in → send back to AuthPage at "/"
+    // Not logged in: redirect back to AuthPage at "/"
     return <Navigate to="/" replace />;
   }
 
-  // Logged in → render the protected content
+  // Logged in: render the protected route
   return children;
 }

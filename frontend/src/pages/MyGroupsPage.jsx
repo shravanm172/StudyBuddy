@@ -1,3 +1,8 @@
+/*
+ * Show all study groups the current user is a member of withrole badges (admin/member) and group metadata.
+ * Provides quick navigation to individual group pages.
+ */
+
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +18,6 @@ export default function MyGroupsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Load user's groups on component mount
   useEffect(() => {
     async function loadUserGroups() {
       if (!user) {
@@ -28,7 +32,6 @@ export default function MyGroupsPage() {
     loadUserGroups();
   }, [user]);
 
-  // Function to refresh groups data
   const refreshGroups = async () => {
     if (!user) return;
 
@@ -121,9 +124,6 @@ export default function MyGroupsPage() {
         <div className="my-groups-header-content">
           <div>
             <h1 className="my-groups-title">My Study Groups</h1>
-            {/* <p className="my-groups-subtitle">
-              Manage your study groups and collaborate with your study buddies
-            </p> */}
           </div>
           <button
             className="my-groups-refresh-button"

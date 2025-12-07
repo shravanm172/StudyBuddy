@@ -1,46 +1,18 @@
-// src/utils/rankingEngine.js
-
 /**
- * StudyBuddy Ranking Engine
+ * StudyBuddy People Ranking Engine for People Feed
  * 
- * This module implements the compatibility scoring algorithm for matching users
- * based on shared courses and similar characteristics.
  * 
- * COMPATIBILITY SCORE CALCULATION:
- * ================================
- * 
+ * COMPATIBILITY SCORE CALCULATION: 
  * The compatibility score is calculated using multiple weighted factors:
  * 
  * 1. SHARED COURSES COUNT (Weight: 1.0 per course)
- *    - Simple count: +1 point for each shared course
- *    - Example: If User A has [CS101, MATH201, ENG101] and User B has [CS101, MATH201, HIST101]
- *      - Shared: 2 courses (CS101, MATH201)
- *      - Score contribution: 2 × 1.0 = 2.0 points
+ *    - +1 point for each shared course
  * 
  * 2. GRADE LEVEL MATCH (Weight: 1.0)
- *    - Binary bonus: +1.0 if users are in the same grade level
- *    - Example: Both are "junior" → +1.0 points
- * 
- * FILTERING:
- * ==========
+ *    - +1.0 if users are in the same grade level
+ *
  * Only users who share at least ONE course with the current user are included
  * in the ranked results. This ensures all recommendations are relevant.
- * 
- * EXAMPLE CALCULATION:
- * ===================
- * Current User: {courses: ["CS101", "MATH201", "ENG101"], grade: "junior"}
- * Target User:  {courses: ["CS101", "MATH201", "HIST101"], grade: "junior"}
- * 
- * 1. Shared courses: 2 (CS101, MATH201)
- * 2. Shared courses score: 2 × 1.0 = 2.0
- * 3. Grade match bonus: +1.0 (both junior)
- * 4. Total compatibility score: 2.0 + 1.0 = 3.0
- * 
- * This simplified approach makes it easy to understand: more shared courses = higher compatibility!
- */
-
-/**
- * Calculate age from date of birth
  */
 export function calculateAge(dateOfBirth) {
   if (!dateOfBirth) return null;
@@ -57,9 +29,6 @@ export function calculateAge(dateOfBirth) {
   return age;
 }
 
-/**
- * Calculate compatibility score between current user and another user
- */
 export function calculateUserScore(currentUser, targetUser) {
   if (!currentUser || !targetUser) return 0;
   
@@ -84,18 +53,12 @@ export function calculateUserScore(currentUser, targetUser) {
   return score;
 }
 
-/**
- * Get shared courses between two users
- */
 export function getSharedCourses(currentUserCourses, targetUserCourses) {
   if (!currentUserCourses || !targetUserCourses) return [];
   
   return currentUserCourses.filter(course => targetUserCourses.includes(course));
 }
 
-/**
- * Rank and filter users based on compatibility with current user
- */
 export function rankUsers(currentUser, potentialUsers) {
   if (!currentUser || !potentialUsers) return [];
   
@@ -113,13 +76,13 @@ export function rankUsers(currentUser, potentialUsers) {
     
     return {
       ...user,
-      compatibilityScore: Math.round(score * 100) / 100, // Round to 2 decimal places
+      compatibilityScore: Math.round(score * 100) / 100,
       sharedCourses,
       age
     };
   });
   
-  // Sort by score (highest first), then by username for consistency
+  // Sort by compatibility score, then by username for consistency
   scoredUsers.sort((a, b) => {
     if (b.compatibilityScore !== a.compatibilityScore) {
       return b.compatibilityScore - a.compatibilityScore;
@@ -130,9 +93,6 @@ export function rankUsers(currentUser, potentialUsers) {
   return scoredUsers;
 }
 
-/**
- * Format grade for display
- */
 export function formatGrade(grade) {
   if (!grade) return '';
   
@@ -147,9 +107,6 @@ export function formatGrade(grade) {
   return gradeMap[grade] || grade;
 }
 
-/**
- * Format gender for display
- */
 export function formatGender(gender) {
   if (!gender) return '';
   

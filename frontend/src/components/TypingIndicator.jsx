@@ -1,3 +1,8 @@
+/*
+ * Shows who is currently typing in the group chat.
+ * Displays animated dots and handles multiple simultaneous typers.
+ */
+
 import "./TypingIndicator.css";
 
 function TypingIndicator({ typingUsers = [] }) {

@@ -1,3 +1,8 @@
+/*
+ * Message input field with auto-resize, typing indicators, and keyboard shortcuts.
+ * Supports Enter to send and Shift+Enter for new lines.
+ */
+
 import { useState, useRef, useEffect } from "react";
 import "./MessageInput.css";
 

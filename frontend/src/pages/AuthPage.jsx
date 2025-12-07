@@ -1,3 +1,7 @@
+/*
+ * Authentication page handling login and signup/account creation flows.
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
@@ -11,20 +15,17 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
 
   const [username, setUsername] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState(""); // "YYYY-MM-DD"
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [grade, setGrade] = useState("");
   const [gender, setGender] = useState("");
-  const [courses, setCourses] = useState([]); // array of strings/ids
+  const [courses, setCourses] = useState([]);
 
-  // dynamic enums from backend
   const [enums, setEnums] = useState({ grades: [], genders: [] });
   const [enumsLoading, setEnumsLoading] = useState(false);
 
-  // available courses from backend
   const [availableCourses, setAvailableCourses] = useState([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
 
-  // username validation
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [usernameChecking, setUsernameChecking] = useState(false);
 
@@ -37,7 +38,6 @@ export default function AuthPage() {
     if (user) nav("/groups", { replace: true });
   }, [user, nav]);
 
-  // Load enums from backend
   useEffect(() => {
     async function loadEnums() {
       if (mode !== "signup") return;
@@ -61,7 +61,6 @@ export default function AuthPage() {
     loadEnums();
   }, [mode]);
 
-  // Load available courses from backend
   useEffect(() => {
     async function loadCourses() {
       if (mode !== "signup") return;
@@ -87,7 +86,6 @@ export default function AuthPage() {
     loadCourses();
   }, [mode]);
 
-  // check username availability
   const checkUsername = async (username) => {
     if (!username || username.length < 3) {
       setUsernameAvailable(null);
@@ -113,7 +111,7 @@ export default function AuthPage() {
     }
   };
 
-  // Debounced username check
+  // Debounce username check to avoid excessive API calls
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (mode === "signup" && username) {
@@ -129,7 +127,6 @@ export default function AuthPage() {
       prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
     );
 
-  // Block UI until Firebase resolves initial state
   if (initializing) {
     return <div className="auth-container">Loading…</div>;
   }
@@ -144,9 +141,7 @@ export default function AuthPage() {
     try {
       if (mode === "login") {
         await login(email, password);
-        // useEffect will redirect once user is set
       } else {
-        // Validation: username, dateOfBirth, grade, gender required
         if (!username || !dateOfBirth || !grade || !gender) {
           throw new Error("Please complete all required fields.");
         }
@@ -163,10 +158,9 @@ export default function AuthPage() {
           throw new Error("Password must be at least 6 characters.");
         }
 
-        // Payload matches backend schema: username, date_of_birth, grade, gender, courses
         await signup(email, password, {
           username,
-          date_of_birth: dateOfBirth, // "YYYY-MM-DD"
+          date_of_birth: dateOfBirth,
           grade,
           gender,
           courses,

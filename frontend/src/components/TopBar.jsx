@@ -1,3 +1,8 @@
+/*
+ * Top navigation bar with app branding and logout button.
+ * Displays user email and handles logout flow.
+ */
+
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import "./TopBar.css";

@@ -1,3 +1,8 @@
+/*
+ * Real-time group chat component with Firebase Firestore messaging.
+ * Handles message sending, live updates, typing indicators, and access control.
+ */
+
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { db } from "../auth/firebase";

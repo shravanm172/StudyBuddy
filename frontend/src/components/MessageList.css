@@ -1,4 +1,3 @@
-/* MessageList.css */
 .message-list-container {
   flex: 1;
   overflow-y: auto;
@@ -166,14 +165,12 @@
   text-align: right;
 }
 
-/* Hover effects */
 .message-item:hover .message-bubble {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .message-content {
     max-width: 85%;

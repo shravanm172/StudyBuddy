@@ -1,5 +1,3 @@
-/* ProfilePage.css - Styles for Profile page component */
-
 .profile-page-container {
   max-width: 600px;
   margin: 48px auto;
@@ -108,7 +106,6 @@
   background-color: #e9ecef;
 }
 
-/* Password change section styles */
 .password-change-section {
   margin-top: 32px;
 }
