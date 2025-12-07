@@ -571,8 +571,7 @@ class GroupRepo:
             if user_group_ids:
                 query = query.filter(~Group.id.in_(user_group_ids))
             
-            # Return groups in creation order (newest first) - no ranking here
-            groups = query.distinct().order_by(Group.created_at.desc()).all()
+            groups = query.distinct().all()
             
             print(f"Debug: Found {len(groups)} visible groups for user courses: {user_course_ids}")
             print(f"Debug: User is already in groups: {user_group_ids}")

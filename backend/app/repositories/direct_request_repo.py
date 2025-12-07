@@ -39,18 +39,6 @@ class DirectRequestRepo:
         if existing_pending:
             raise ValueError("You already have a pending request to this user")
         
-        # check if there's an accepted request in either direction
-        existing_accepted = DirectRequest.query.filter(
-            or_(
-                and_(DirectRequest.sender_uid == sender_uid, DirectRequest.receiver_uid == receiver_uid),
-                and_(DirectRequest.sender_uid == receiver_uid, DirectRequest.receiver_uid == sender_uid)
-            ),
-            DirectRequest.status == RequestStatus.ACCEPTED
-        ).first()
-        
-        if existing_accepted:
-            raise ValueError("You are already connected with this user")
-        
         try:
             request = DirectRequest(
                 sender_uid=sender_uid,
