@@ -1,4 +1,13 @@
-# app/controllers/group_request_controller.py
+"""
+Group Request Controller
+Handles group join requests and admin approval workflow
+
+Routes:
+POST    /api/group-requests/                        - Create a join request for a group
+GET     /api/group-requests/group/<id>/             - Get all pending requests for a group (admin only)
+POST    /api/group-requests/<id>/respond/           - Respond to a join request (admin only)
+GET     /api/group-requests/my-requests/            - Get all join requests created by current user
+"""
 from flask import Blueprint, request, jsonify
 from app.repositories.group_request_repo import GroupRequestRepo
 
@@ -13,8 +22,6 @@ def create_join_request():
     if request.method == "OPTIONS":
         return "", 200
     
-    print("📝 === CREATE GROUP JOIN REQUEST ===")
-    
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
@@ -26,9 +33,7 @@ def create_join_request():
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         requester_uid = decoded.get("uid")
-        print(f"✅ Token verified! Requester UID: {requester_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     # Get request data
@@ -42,12 +47,7 @@ def create_join_request():
         
         if not group_id:
             return jsonify({"error": "group_id is required"}), 400
-            
-        print(f"📝 User {requester_uid} requesting to join group {group_id}")
-        print(f"📝 Message: {message}")
-        
     except Exception as e:
-        print(f"❌ Error parsing request data: {e}")
         return jsonify({"error": "Invalid request data"}), 400
 
     try:
@@ -55,7 +55,6 @@ def create_join_request():
         result = GroupRequestRepo.create_join_request(requester_uid, group_id, message)
         
         if result["success"]:
-            print(f"✅ {result['message']}")
             return jsonify({
                 "success": True,
                 "message": result["message"],
@@ -63,14 +62,8 @@ def create_join_request():
                 "request": result.get("request")
             }), 200
         else:
-            print(f"❌ Join request failed: {result['error']}")
-            return jsonify({
-                "success": False,
-                "error": result["error"]
-            }), 400
-            
+            return jsonify({"success": False, "error": result["error"]}), 400
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -82,8 +75,6 @@ def get_group_pending_requests(group_id):
     if request.method == "OPTIONS":
         return "", 200
     
-    print(f"📋 === GET PENDING REQUESTS FOR GROUP {group_id} ===")
-    
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
@@ -95,9 +86,7 @@ def get_group_pending_requests(group_id):
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         admin_uid = decoded.get("uid")
-        print(f"✅ Token verified! Admin UID: {admin_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     try:
@@ -108,14 +97,8 @@ def get_group_pending_requests(group_id):
         
         # Get pending requests
         requests = GroupRequestRepo.get_pending_requests_for_group(group_id)
-        
-        print(f"✅ Found {len(requests)} pending requests for group {group_id}")
-        return jsonify({
-            "requests": requests
-        }), 200
-        
+        return jsonify({"requests": requests}), 200
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -127,8 +110,6 @@ def respond_to_request(request_id):
     if request.method == "OPTIONS":
         return "", 200
     
-    print(f"✅❌ === RESPOND TO REQUEST {request_id} ===")
-    
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
@@ -140,9 +121,7 @@ def respond_to_request(request_id):
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         admin_uid = decoded.get("uid")
-        print(f"✅ Token verified! Admin UID: {admin_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     # Get request data
@@ -154,11 +133,7 @@ def respond_to_request(request_id):
         accept = data.get("accept")
         if accept is None:
             return jsonify({"error": "accept field is required (true/false)"}), 400
-            
-        print(f"✅❌ Admin {admin_uid} {'accepting' if accept else 'rejecting'} request {request_id}")
-        
     except Exception as e:
-        print(f"❌ Error parsing request data: {e}")
         return jsonify({"error": "Invalid request data"}), 400
 
     try:
@@ -166,20 +141,10 @@ def respond_to_request(request_id):
         result = GroupRequestRepo.respond_to_request(request_id, admin_uid, accept)
         
         if result["success"]:
-            print(f"✅ {result['message']}")
-            return jsonify({
-                "success": True,
-                "message": result["message"]
-            }), 200
+            return jsonify({"success": True, "message": result["message"]}), 200
         else:
-            print(f"❌ Response failed: {result['error']}")
-            return jsonify({
-                "success": False,
-                "error": result["error"]
-            }), 400
-            
+            return jsonify({"success": False, "error": result["error"]}), 400
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -190,8 +155,6 @@ def get_my_pending_requests():
     # Handle preflight OPTIONS request
     if request.method == "OPTIONS":
         return "", 200
-    
-    print("📋 === GET MY PENDING REQUESTS ===")
     
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
@@ -204,20 +167,12 @@ def get_my_pending_requests():
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         user_uid = decoded.get("uid")
-        print(f"✅ Token verified! User UID: {user_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     try:
         # Get user's pending requests
         requests = GroupRequestRepo.get_user_pending_requests(user_uid)
-        
-        print(f"✅ Found {len(requests)} pending requests for user {user_uid}")
-        return jsonify({
-            "requests": requests
-        }), 200
-        
+        return jsonify({"requests": requests}), 200
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500

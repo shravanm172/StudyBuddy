@@ -1,9 +1,8 @@
-# app/models/group.py
 from datetime import datetime
 from enum import Enum
 from app import db
 
-# Association table for many-to-many relationship between groups and courses
+# Junction table for many-to-many relationship between groups and courses studied
 group_courses = db.Table('group_courses',
     db.Column('group_id', db.Integer, db.ForeignKey('groups.id'), primary_key=True),
     db.Column('course_id', db.String, db.ForeignKey('courses.course_id'), primary_key=True),
@@ -15,8 +14,8 @@ class GroupRole(Enum):
     MEMBER = "member"
 
 class GroupPrivacy(Enum):
-    PUBLIC = "public"      # Auto-join allowed
-    PRIVATE = "private"    # Admin approval required
+    PUBLIC = "public"      # Auto-join allowed if public
+    PRIVATE = "private"    # Admin approval required if private
 
 class Group(db.Model):
     __tablename__ = 'groups'
@@ -29,7 +28,7 @@ class Group(db.Model):
     is_visible = db.Column(db.Boolean, default=True, nullable=False)  # Visible on group feed
     privacy = db.Column(db.Enum(GroupPrivacy), default=GroupPrivacy.PRIVATE, nullable=False)
     
-    # Metadata
+    # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     

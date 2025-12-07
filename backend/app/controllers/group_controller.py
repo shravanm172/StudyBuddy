@@ -1,4 +1,21 @@
-# app/controllers/group_controller.py
+"""
+Group Controller
+Handles study group operations and management
+
+Routes:
+GET     /api/groups/shared-memberships/             - Get users who share group memberships with current user for study buddy suggestions
+GET     /api/groups/<id>/                           - Get group details including members
+GET     /api/groups/user-groups/                    - Get all groups current user belongs to
+POST    /api/groups/<id>/kick/                      - Remove a member from group (admin only)
+POST    /api/groups/<id>/courses/                   - Add a course to group (admin only)
+DELETE  /api/groups/<id>/courses/<course_id>/       - Remove a course from group (admin only)
+PUT     /api/groups/<id>/visibility/                - Toggle group visibility (admin only)
+PUT     /api/groups/<id>/info/                      - Update group name and description (admin only)
+GET     /api/groups/feed/                           - Get personalized group feed for current user
+GET     /api/groups/debug/all-visible/              - Debug endpoint to see all visible groups
+GET     /api/groups/<id>/chat/access/               - Verify user has access to group chat
+"""
+
 from flask import Blueprint, request, jsonify
 from app.repositories.group_repo import GroupRepo
 from app.repositories.user_repo import UserRepo
@@ -15,42 +32,30 @@ def get_shared_memberships():
     if request.method == "OPTIONS":
         return "", 200
     
-    print("🔗 === GET SHARED GROUP MEMBERSHIPS RECEIVED ===")
-    
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
-    print(f"🔑 Auth header present: {bool(auth_header)}")
     
     if not auth_header.startswith("Bearer "):
-        print("❌ Invalid authorization header format")
         return jsonify({"error": "Missing or invalid Authorization header"}), 401
     
     token = auth_header.split(" ", 1)[1]
-    print(f"🎫 Extracted token length: {len(token)}")
     
     try:
         from firebase_admin import auth as firebase_auth
-        print("🔍 Verifying Firebase token...")
         decoded = firebase_auth.verify_id_token(token)
         user_uid = decoded.get("uid")
-        print(f"✅ Token verified! User UID: {user_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     try:
-        print(f"🔍 Getting shared memberships for user {user_uid}...")
-        
         # Get all groups the user is a member of
         user_groups = GroupRepo.get_user_groups(user_uid)
-        print(f"📋 User is in {len(user_groups)} groups")
         
-        # For each group, get all other members
+        # For each group, collect all other members
         shared_memberships = {}  # uid -> True if they share any groups
         
         for group in user_groups:
             group_members = GroupRepo.get_group_members(group['id'])
-            print(f"👥 Group {group['id']} has {len(group_members)} members")
             
             # Add all other members to shared memberships
             for member in group_members:
@@ -60,12 +65,8 @@ def get_shared_memberships():
         # Convert to list of UIDs
         shared_user_uids = list(shared_memberships.keys())
         
-        print(f"✅ Found {len(shared_user_uids)} users with shared group memberships")
-        return jsonify({
-            "shared_memberships": shared_user_uids
-        }), 200
+        return jsonify({"shared_memberships": shared_user_uids}), 200
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -77,41 +78,30 @@ def get_group_details(group_id):
     if request.method == "OPTIONS":
         return "", 200
     
-    print(f"📋 === GET GROUP DETAILS {group_id} RECEIVED ===")
-    
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
-    print(f"🔑 Auth header present: {bool(auth_header)}")
     
     if not auth_header.startswith("Bearer "):
-        print("❌ Invalid authorization header format")
         return jsonify({"error": "Missing or invalid Authorization header"}), 401
     
     token = auth_header.split(" ", 1)[1]
-    print(f"🎫 Extracted token length: {len(token)}")
     
     try:
         from firebase_admin import auth as firebase_auth
-        print("🔍 Verifying Firebase token...")
         decoded = firebase_auth.verify_id_token(token)
         user_uid = decoded.get("uid")
-        print(f"✅ Token verified! User UID: {user_uid}")
+        print(f"Token verified. User UID: {user_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     try:
-        print(f"🔍 Getting group details for group {group_id}...")
-        
         # Check if user is a member of this group
         if not GroupRepo.is_member(group_id, user_uid):
-            print(f"❌ User {user_uid} is not a member of group {group_id}")
             return jsonify({"error": "You are not a member of this group"}), 403
         
         # Get group details
         group_data = GroupRepo.get_group(group_id)
         if not group_data:
-            print(f"❌ Group {group_id} not found")
             return jsonify({"error": "Group not found"}), 404
         
         # Get group members with user details
@@ -135,12 +125,9 @@ def get_group_details(group_id):
         user_member = next((m for m in members if m['user_uid'] == user_uid), None)
         group_data['user_role'] = user_member['role'] if user_member else None
         
-        print(f"✅ Found group with {len(enriched_members)} members")
-        return jsonify({
-            "group": group_data
-        }), 200
+        return jsonify({"group": group_data}), 200
     except Exception as e:
-        print(f"💥 Database error: {e}")
+        return jsonify({"error": str(e)}), 500
         return jsonify({"error": str(e)}), 500
 
 
@@ -152,71 +139,49 @@ def get_user_groups():
     if request.method == "OPTIONS":
         return "", 200
     
-    print("📋 === GET USER GROUPS RECEIVED ===")
-    
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
-    print(f"🔑 Auth header present: {bool(auth_header)}")
     
     if not auth_header.startswith("Bearer "):
-        print("❌ Invalid authorization header format")
         return jsonify({"error": "Missing or invalid Authorization header"}), 401
     
     token = auth_header.split(" ", 1)[1]
-    print(f"🎫 Extracted token length: {len(token)}")
     
     try:
         from firebase_admin import auth as firebase_auth
-        print("🔍 Verifying Firebase token...")
         decoded = firebase_auth.verify_id_token(token)
         user_uid = decoded.get("uid")
-        print(f"✅ Token verified! User UID: {user_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     try:
-        print(f"📋 Getting groups for user {user_uid}...")
         user_groups = GroupRepo.get_user_groups(user_uid)
-        
-        print(f"✅ Found {len(user_groups)} groups")
-        return jsonify({
-            "groups": user_groups
-        }), 200
+        return jsonify({"groups": user_groups}), 200
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
 @bp.route("/<int:group_id>/kick/", methods=["POST", "OPTIONS"])
 def kick_member(group_id):
-    """Admin kicks a member from the group"""
+    """Admin kicks/removes a member from the group"""
     
     # Handle preflight OPTIONS request
     if request.method == "OPTIONS":
         return "", 200
     
-    print(f"👢 === KICK MEMBER FROM GROUP {group_id} ===")
-    
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
-    print(f"🔑 Auth header present: {bool(auth_header)}")
     
     if not auth_header.startswith("Bearer "):
-        print("❌ Invalid authorization header format")
         return jsonify({"error": "Missing or invalid Authorization header"}), 401
     
     token = auth_header.split(" ", 1)[1]
-    print(f"🎫 Extracted token length: {len(token)}")
     
     try:
         from firebase_admin import auth as firebase_auth
-        print("🔍 Verifying Firebase token...")
         decoded = firebase_auth.verify_id_token(token)
         admin_uid = decoded.get("uid")
-        print(f"✅ Token verified! Admin UID: {admin_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     # Get request data
@@ -228,11 +193,7 @@ def kick_member(group_id):
         member_to_kick_uid = data.get("member_uid")
         if not member_to_kick_uid:
             return jsonify({"error": "member_uid is required"}), 400
-            
-        print(f"👢 Admin {admin_uid} wants to kick {member_to_kick_uid} from group {group_id}")
-        
     except Exception as e:
-        print(f"❌ Error parsing request data: {e}")
         return jsonify({"error": "Invalid request data"}), 400
 
     try:
@@ -240,20 +201,10 @@ def kick_member(group_id):
         result = GroupRepo.kick_member(group_id, admin_uid, member_to_kick_uid)
         
         if result["success"]:
-            print(f"✅ {result['message']}")
-            return jsonify({
-                "success": True,
-                "message": result["message"]
-            }), 200
+            return jsonify({"success": True, "message": result["message"]}), 200
         else:
-            print(f"❌ Kick failed: {result['error']}")
-            return jsonify({
-                "success": False,
-                "error": result["error"]
-            }), 400
-            
+            return jsonify({"success": False, "error": result["error"]}), 400
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -264,8 +215,6 @@ def add_course_to_group(group_id):
     # Handle preflight OPTIONS request
     if request.method == "OPTIONS":
         return "", 200
-    
-    print(f"📚 === ADD COURSE TO GROUP {group_id} ===")
     
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
@@ -278,9 +227,8 @@ def add_course_to_group(group_id):
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         admin_uid = decoded.get("uid")
-        print(f"✅ Token verified! Admin UID: {admin_uid}")
+        print(f"Token verified. Admin UID: {admin_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     # Get request data
@@ -292,11 +240,7 @@ def add_course_to_group(group_id):
         course_id = data.get("course_id")
         if not course_id:
             return jsonify({"error": "course_id is required"}), 400
-            
-        print(f"📚 Admin {admin_uid} wants to add course {course_id} to group {group_id}")
-        
     except Exception as e:
-        print(f"❌ Error parsing request data: {e}")
         return jsonify({"error": "Invalid request data"}), 400
 
     try:
@@ -311,18 +255,10 @@ def add_course_to_group(group_id):
         success = GroupRepo.add_course_to_group(group_id, course_id)
         
         if success:
-            return jsonify({
-                "success": True,
-                "message": "Course added to group successfully"
-            }), 200
+            return jsonify({"success": True, "message": "Course added to group successfully"}), 200
         else:
-            return jsonify({
-                "success": False,
-                "error": "Failed to add course to group"
-            }), 400
-            
+            return jsonify({"success": False, "error": "Failed to add course to group"}), 400
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -333,8 +269,6 @@ def remove_course_from_group(group_id, course_id):
     # Handle preflight OPTIONS request
     if request.method == "OPTIONS":
         return "", 200
-    
-    print(f"🗑️ === REMOVE COURSE {course_id} FROM GROUP {group_id} ===")
     
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
@@ -347,9 +281,7 @@ def remove_course_from_group(group_id, course_id):
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         admin_uid = decoded.get("uid")
-        print(f"✅ Token verified! Admin UID: {admin_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     try:
@@ -364,18 +296,10 @@ def remove_course_from_group(group_id, course_id):
         success = GroupRepo.remove_course_from_group(group_id, course_id)
         
         if success:
-            return jsonify({
-                "success": True,
-                "message": "Course removed from group successfully"
-            }), 200
+            return jsonify({"success": True, "message": "Course removed from group successfully"}), 200
         else:
-            return jsonify({
-                "success": False,
-                "error": "Failed to remove course from group"
-            }), 400
-            
+            return jsonify({"success": False, "error": "Failed to remove course from group"}), 400
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -386,8 +310,6 @@ def toggle_group_visibility(group_id):
     # Handle preflight OPTIONS request
     if request.method == "OPTIONS":
         return "", 200
-    
-    print(f"👁️ === TOGGLE GROUP {group_id} VISIBILITY ===")
     
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
@@ -400,9 +322,8 @@ def toggle_group_visibility(group_id):
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         admin_uid = decoded.get("uid")
-        print(f"✅ Token verified! Admin UID: {admin_uid}")
+        print(f"Token verified. Admin UID: {admin_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     # Get request data
@@ -414,11 +335,7 @@ def toggle_group_visibility(group_id):
         is_visible = data.get("is_visible")
         if is_visible is None:
             return jsonify({"error": "is_visible is required"}), 400
-            
-        print(f"👁️ Admin {admin_uid} wants to set group {group_id} visibility to {is_visible}")
-        
     except Exception as e:
-        print(f"❌ Error parsing request data: {e}")
         return jsonify({"error": "Invalid request data"}), 400
 
     try:
@@ -433,18 +350,10 @@ def toggle_group_visibility(group_id):
         result = GroupRepo.update_group_info(group_id, is_visible=is_visible)
         
         if result["success"]:
-            return jsonify({
-                "success": True,
-                "message": result["message"]
-            }), 200
+            return jsonify({"success": True, "message": result["message"]}), 200
         else:
-            return jsonify({
-                "success": False,
-                "error": result["error"]
-            }), 400
-            
+            return jsonify({"success": False, "error": result["error"]}), 400
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -455,8 +364,6 @@ def update_group_info(group_id):
     # Handle preflight OPTIONS request
     if request.method == "OPTIONS":
         return "", 200
-    
-    print(f"📝 === UPDATE GROUP {group_id} INFO ===")
     
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
@@ -469,9 +376,8 @@ def update_group_info(group_id):
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         admin_uid = decoded.get("uid")
-        print(f"✅ Token verified! Admin UID: {admin_uid}")
+        print(f"Token verified. Admin UID: {admin_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     # Get request data
@@ -501,11 +407,7 @@ def update_group_info(group_id):
             description = description.strip()
             if len(description) > 500:
                 return jsonify({"error": "Group description must be 500 characters or less"}), 400
-            
-        print(f"📝 Admin {admin_uid} updating group {group_id}: name='{name}', description='{description}'")
-        
     except Exception as e:
-        print(f"❌ Error parsing request data: {e}")
         return jsonify({"error": "Invalid request data"}), 400
 
     try:
@@ -520,30 +422,20 @@ def update_group_info(group_id):
         result = GroupRepo.update_group_info(group_id, name=name, description=description)
         
         if result["success"]:
-            return jsonify({
-                "success": True,
-                "message": result["message"]
-            }), 200
+            return jsonify({"success": True, "message": result["message"]}), 200
         else:
-            return jsonify({
-                "success": False,
-                "error": result["error"]
-            }), 400
-            
+            return jsonify({"success": False, "error": result["error"]}), 400
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
 @bp.route("/feed/", methods=["GET", "OPTIONS"])
 def get_group_feed():
-    """Get recommended groups for the user based on course overlap"""
+    """Get recommended groups for the user based on similar courses studied"""
     
     # Handle preflight OPTIONS request
     if request.method == "OPTIONS":
         return "", 200
-    
-    print("🔍 === GET GROUP FEED ===")
     
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
@@ -556,27 +448,19 @@ def get_group_feed():
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         user_uid = decoded.get("uid")
-        print(f"✅ Token verified! User UID: {user_uid}")
+        print(f"Token verified. User UID: {user_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": f"Invalid or expired Firebase token: {str(e)}"}), 401
 
     try:
-        print(f"📚 Getting recommended groups for user {user_uid}...")
         result = GroupRepo.get_recommended_groups_for_user(user_uid)
         
         # Extract data from the new format
         user_courses = result.get("user_courses", [])
         groups = result.get("groups", [])
         
-        print(f"✅ Found {len(groups)} recommended groups for user courses: {user_courses}")
-        return jsonify({
-            "user_courses": user_courses,
-            "groups": groups
-        }), 200
-        
+        return jsonify({"user_courses": user_courses, "groups": groups}), 200
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -611,9 +495,7 @@ def debug_all_visible_groups():
             "visible_groups": groups_data,
             "total_visible": len(groups_data)
         }), 200
-        
     except Exception as e:
-        print(f"💥 Debug error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -624,8 +506,6 @@ def check_chat_access(group_id):
     # Handle preflight OPTIONS request
     if request.method == "OPTIONS":
         return "", 200
-    
-    print(f"💬 === CHECK CHAT ACCESS FOR GROUP {group_id} ===")
     
     # Get and verify Firebase token
     auth_header = request.headers.get("Authorization", "")
@@ -638,13 +518,12 @@ def check_chat_access(group_id):
         from firebase_admin import auth as firebase_auth
         decoded = firebase_auth.verify_id_token(token)
         user_uid = decoded.get("uid")
-        print(f"✅ Token verified! User UID: {user_uid}")
+        print(f"Token verified. User UID: {user_uid}")
     except Exception as e:
-        print(f"❌ Token verification error: {e}")
         return jsonify({"error": "Invalid or expired Firebase token"}), 401
     
     try:
-        # Simply check if user is a member of the group
+        # Check if user is group member
         from app.models.group import GroupMember
         
         member = GroupMember.query.filter_by(
@@ -653,19 +532,15 @@ def check_chat_access(group_id):
         ).first()
         
         if member:
-            print(f"✅ User {user_uid} has access to group {group_id} chat")
             return jsonify({
                 "has_access": True,
                 "role": member.role.value,
                 "message": "Chat access granted"
             }), 200
         else:
-            print(f"❌ User {user_uid} is not a member of group {group_id}")
             return jsonify({
                 "has_access": False,
                 "message": "You must be a group member to access the chat"
             }), 403
-            
     except Exception as e:
-        print(f"💥 Database error: {e}")
         return jsonify({"error": "Failed to check chat access"}), 500

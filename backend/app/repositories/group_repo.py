@@ -1,4 +1,26 @@
-# app/repositories/group_repo.py
+"""
+Group Repository
+Handles study group operations, membership management, and course associations
+
+Methods:
+- create_group(name, admin_uid, description, is_visible, privacy, course_ids) - Create a new study group
+- get_group(group_id)                                   - Get group details by ID
+- get_user_groups(user_uid)                             - Get all groups a user belongs to
+- get_visible_groups()                                  - Get all publicly visible groups
+- add_member(group_id, user_uid, role)                  - Add a member to a group
+- remove_member(group_id, user_uid)                     - Remove a member from a group
+- kick_member(group_id, admin_uid, member_to_kick_uid)  - Admin kicks a member from group
+- update_group_info(group_id, name, description, is_visible) - Update group details
+- update_member_role(group_id, user_uid, new_role)      - Change member's role
+- is_member(group_id, user_uid)                         - Check if user is a member
+- is_admin(group_id, user_uid)                          - Check if user is an admin
+- get_group_members(group_id)                           - Get all members of a group
+- add_course_to_group(group_id, course_id)              - Add a course to group's study list
+- remove_course_from_group(group_id, course_id)         - Remove a course from group
+- get_groups_by_course(course_id)                       - Get all groups studying a course for Group Feed
+- get_recommended_groups_for_user(user_uid)             - Get personalized group recommendations for Group Feed
+"""
+
 from typing import List, Optional, Dict, Any
 from sqlalchemy.exc import IntegrityError
 from app import db
@@ -13,16 +35,6 @@ class GroupRepo:
         """
         Create a new group with the specified admin.
         
-        Args:
-            name: Group name
-            admin_uid: Firebase UID of the group admin
-            description: Optional group description
-            is_visible: Whether group is visible on group feed
-            privacy: Group privacy setting (public/private)
-            course_ids: List of course IDs that this group studies
-            
-        Returns:
-            Dictionary representation of created group, or None if creation failed
         """
         try:
             # Create the group
@@ -47,7 +59,7 @@ class GroupRepo:
             
             # Add courses to the group if provided
             if course_ids:
-                from app.models.user import Course  # Import here to avoid circular imports
+                from app.models.user import Course  
                 for course_id in course_ids:
                     course = Course.query.get(course_id)
                     if course:
@@ -73,7 +85,10 @@ class GroupRepo:
     
     @staticmethod
     def get_group(group_id: int) -> Optional[Dict[str, Any]]:
-        """Get group by ID with member details."""
+        """
+        Get group by ID with member details.
+
+        """
         try:
             group = Group.query.get(group_id)
             if not group:
@@ -90,7 +105,10 @@ class GroupRepo:
     
     @staticmethod
     def get_user_groups(user_uid: str) -> List[Dict[str, Any]]:
-        """Get all groups that a user is a member of."""
+        """
+        Get all groups that a user is a member of.
+
+        """
         try:
             member_records = GroupMember.query.filter_by(user_uid=user_uid).all()
             groups = []
@@ -108,7 +126,9 @@ class GroupRepo:
     
     @staticmethod
     def get_visible_groups() -> List[Dict[str, Any]]:
-        """Get all groups that are marked as visible for the group feed."""
+        """
+        Get all groups that are marked as visible for the group feed.
+        """
         try:
             groups = Group.query.filter_by(is_visible=True).order_by(Group.created_at.desc()).all()
             return [group.to_dict() for group in groups]
@@ -120,14 +140,7 @@ class GroupRepo:
     def add_member(group_id: int, user_uid: str, role: GroupRole = GroupRole.MEMBER) -> bool:
         """
         Add a member to a group.
-        
-        Args:
-            group_id: ID of the group
-            user_uid: Firebase UID of user to add
-            role: Role to assign (default: MEMBER)
-            
-        Returns:
-            True if member was added successfully, False otherwise
+
         """
         try:
             # Check if group exists
@@ -170,15 +183,8 @@ class GroupRepo:
     @staticmethod
     def remove_member(group_id: int, user_uid: str) -> bool:
         """
-        Remove a member from a group.
-        Handles admin transfer logic and group deletion if needed.
+        Remove a member from a group and handles admin transfer logic and group deletion if needed.
         
-        Args:
-            group_id: ID of the group
-            user_uid: Firebase UID of user to remove
-            
-        Returns:
-            True if member was removed successfully, False otherwise
         """
         try:
             # Get the member to remove
@@ -227,16 +233,9 @@ class GroupRepo:
         """
         Admin kicks a member from the group.
         
-        Args:
-            group_id: ID of the group
-            admin_uid: Firebase UID of the admin performing the kick
-            member_to_kick_uid: Firebase UID of the member to kick
-            
-        Returns:
-            Dict with success status and message
         """
         try:
-            # Verify the admin is actually an admin of this group
+            # Verify admin role
             admin_member = GroupMember.query.filter_by(
                 group_id=group_id,
                 user_uid=admin_uid,
@@ -249,7 +248,7 @@ class GroupRepo:
                     "error": "You must be an admin to kick members"
                 }
             
-            # Can't kick yourself
+            # Prevent user from kicking themselves from the group
             if admin_uid == member_to_kick_uid:
                 return {
                     "success": False,
@@ -268,7 +267,7 @@ class GroupRepo:
                     "error": "User is not a member of this group"
                 }
             
-            # Use the existing remove_member logic
+            # Use the existing remove_member logic to kick the member
             success = GroupRepo.remove_member(group_id, member_to_kick_uid)
             
             if success:
@@ -295,15 +294,6 @@ class GroupRepo:
         """
         Update group information with validation.
         
-        Args:
-            group_id: ID of the group to update
-            name: New group name (optional)
-            description: New description (optional)
-            is_visible: New visibility setting (optional)
-            privacy: New privacy setting (optional)
-            
-        Returns:
-            Dict with success status and message/error
         """
         try:
             group = Group.query.get(group_id)
@@ -313,7 +303,7 @@ class GroupRepo:
                     "error": f"Group {group_id} not found"
                 }
             
-            # VALIDATION: If trying to make group visible (public), ensure it has courses
+            # If trying to make group public it must specify the courses studied
             if is_visible is True and len(group.courses) == 0:
                 return {
                     "success": False,
@@ -361,13 +351,6 @@ class GroupRepo:
         """
         Update a member's role in a group.
         
-        Args:
-            group_id: ID of the group
-            user_uid: Firebase UID of the member
-            new_role: New role to assign
-            
-        Returns:
-            True if role was updated successfully, False otherwise
         """
         try:
             member = GroupMember.query.filter_by(
@@ -391,7 +374,10 @@ class GroupRepo:
     
     @staticmethod
     def is_member(group_id: int, user_uid: str) -> bool:
-        """Check if a user is a member of a group."""
+        """
+        Check if a user is a member of a group.
+
+        """
         try:
             member = GroupMember.query.filter_by(
                 group_id=group_id, 
@@ -404,7 +390,10 @@ class GroupRepo:
     
     @staticmethod
     def is_admin(group_id: int, user_uid: str) -> bool:
-        """Check if a user is an admin of a group."""
+        """
+        Check if a user is an admin of a group.
+
+        """
         try:
             member = GroupMember.query.filter_by(
                 group_id=group_id, 
@@ -418,7 +407,10 @@ class GroupRepo:
     
     @staticmethod
     def get_group_members(group_id: int) -> List[Dict[str, Any]]:
-        """Get all members of a specific group."""
+        """
+        Get all members of a specific group
+
+        """
         try:
             members = GroupMember.query.filter_by(group_id=group_id).order_by(GroupMember.joined_at).all()
             return [member.to_dict() for member in members]
@@ -431,13 +423,14 @@ class GroupRepo:
         """
         Delete a group and all its members.
         Private method used when last member leaves.
+
         """
         try:
             group = Group.query.get(group_id)
             if not group:
                 return False
             
-            # Delete all members first (cascade should handle this, but being explicit)
+            # Delete all members first 
             GroupMember.query.filter_by(group_id=group_id).delete()
             
             # Delete the group
@@ -457,12 +450,6 @@ class GroupRepo:
         """
         Add a course to a group's study list.
         
-        Args:
-            group_id: ID of the group
-            course_id: ID of the course to add
-            
-        Returns:
-            True if course was added successfully, False otherwise
         """
         try:
             from app.models.user import Course
@@ -477,7 +464,7 @@ class GroupRepo:
             # Check if course is already in group
             if course in group.courses:
                 print(f"Course {course_id} already in group {group_id}")
-                return True  # Not an error, just already exists
+                return True  
             
             group.courses.append(course)
             db.session.commit()
@@ -495,12 +482,6 @@ class GroupRepo:
         """
         Remove a course from a group's study list.
         
-        Args:
-            group_id: ID of the group
-            course_id: ID of the course to remove
-            
-        Returns:
-            True if course was removed successfully, False otherwise
         """
         try:
             from app.models.user import Course
@@ -529,13 +510,8 @@ class GroupRepo:
     @staticmethod
     def get_groups_by_course(course_id: str) -> List[Dict[str, Any]]:
         """
-        Get all visible groups that study a specific course.
+        Get all visible groups that study a specific course. Used by Group Feed.
         
-        Args:
-            course_id: ID of the course
-            
-        Returns:
-            List of group dictionaries
         """
         try:
             from app.models.user import Course
@@ -544,7 +520,7 @@ class GroupRepo:
             if not course:
                 return []
             
-            # Get all visible groups for this course
+            # Get all public groups for this course to build Group Feed
             groups = Group.query.join(Group.courses).filter(
                 Course.course_id == course_id,
                 Group.is_visible == True
@@ -561,19 +537,14 @@ class GroupRepo:
         """
         Get visible groups that study courses the user is enrolled in.
         Excludes groups the user is already a member of.
-        Returns groups with overlap information but NO ranking (ranking done in frontend).
-        
-        Args:
-            user_uid: Firebase UID of the user
-            
-        Returns:
-            List of group dictionaries with course overlap info and user courses (unranked)
+        Returns groups with shared courses (unranked)
+    
         """
         try:
             from app.models.user import UserCourse, Course
             from app.repositories.user_repo import UserRepo
             
-            # Get user's profile including courses
+            # Get user's courses
             user_data = UserRepo.get_user(user_uid)
             if not user_data:
                 print(f"Debug: User {user_uid} not found")
@@ -608,7 +579,7 @@ class GroupRepo:
             for group in groups:
                 print(f"Debug: Group {group.id} ({group.name}) - visible: {group.is_visible}, privacy: {group.privacy}")
             
-            # Add course overlap information and user courses for frontend ranking
+            # Add course overlap information and user courses for ranking
             groups_with_overlap = []
             for group in groups:
                 group_dict = group.to_dict()
@@ -625,7 +596,6 @@ class GroupRepo:
                 
                 groups_with_overlap.append(group_dict)
             
-            # Include user courses in response for frontend ranking
             result = {
                 "user_courses": user_course_ids,
                 "groups": groups_with_overlap

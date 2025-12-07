@@ -13,7 +13,7 @@ class GroupRequest(db.Model):
     requester_uid = db.Column(db.String, db.ForeignKey("users.uid"), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
     status = db.Column(db.Enum(GroupRequestStatus), nullable=False, default=GroupRequestStatus.PENDING)
-    message = db.Column(db.Text, nullable=True)  # Optional message with request
+    message = db.Column(db.Text, nullable=True)  
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
     

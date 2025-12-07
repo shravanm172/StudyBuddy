@@ -1,3 +1,9 @@
+""""
+Configuration file for Alembic migrations. Connects Flask app models to the migration system. 
+Do not edit. 
+
+"""
+
 import logging
 from logging.config import fileConfig
 
@@ -16,11 +22,13 @@ logger = logging.getLogger('alembic.env')
 
 
 def get_engine():
+    """
+    Get database connection from Flask-SQLAlchemy
+
+    """
     try:
-        # this works with Flask-SQLAlchemy<3 and Alchemical
         return current_app.extensions['migrate'].db.get_engine()
     except (TypeError, AttributeError):
-        # this works with Flask-SQLAlchemy>=3
         return current_app.extensions['migrate'].db.engine
 
 

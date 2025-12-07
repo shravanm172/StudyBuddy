@@ -1,4 +1,15 @@
-# app/repositories/group_request_repo.py
+"""
+Group Request Repository
+Handles group join request operations and admin approval workflow
+
+Methods:
+- create_join_request(requester_uid, group_id, message)   - Create a join request (auto-accept for public groups)
+- get_pending_requests_for_group(group_id)                - Get all pending requests for a group (admin only)
+- get_user_pending_requests(user_uid)                     - Get all pending requests sent by user
+- respond_to_request(request_id, admin_uid, accept)       - Admin accepts or rejects a join request
+- get_request_by_id(request_id)                           - Fetch a specific request by ID
+"""
+
 from typing import List, Optional, Dict, Any
 from sqlalchemy.exc import IntegrityError
 from app import db
@@ -11,16 +22,9 @@ class GroupRequestRepo:
     def create_join_request(requester_uid: str, group_id: int, message: str = None) -> Dict[str, Any]:
         """
         Create a join request for a group.
-        For PUBLIC groups: Auto-accept and add user immediately.
-        For PRIVATE groups: Create pending request for admin approval.
+        For public groups: Auto-accept and add user immediately.
+        For private groups: Create pending request for admin approval.
         
-        Args:
-            requester_uid: Firebase UID of user requesting to join
-            group_id: ID of the group to join
-            message: Optional message with the request
-            
-        Returns:
-            Dict with success status, message, and request info
         """
         try:
             # Check if group exists and is visible
@@ -49,7 +53,7 @@ class GroupRequestRepo:
                     "error": "You are already a member of this group"
                 }
             
-            # Check if there's already a pending request
+            # Prevent duplicate pending requests from the same user to the same group
             existing_request = GroupRequest.query.filter_by(
                 requester_uid=requester_uid,
                 group_id=group_id,
@@ -114,7 +118,10 @@ class GroupRequestRepo:
     
     @staticmethod
     def get_pending_requests_for_group(group_id: int) -> List[Dict[str, Any]]:
-        """Get all pending join requests for a group with user profile data."""
+        """
+        Get all pending join requests for a group with user profile data.
+        
+        """
         try:
             from app.repositories.user_repo import UserRepo
             
@@ -123,7 +130,7 @@ class GroupRequestRepo:
                 status=GroupRequestStatus.PENDING
             ).order_by(GroupRequest.created_at.desc()).all()
             
-            # Enrich each request with user profile data
+            # Populate each request with user profile data
             enriched_requests = []
             for request in requests:
                 request_dict = request.to_dict()
@@ -133,7 +140,7 @@ class GroupRequestRepo:
                 if user_profile:
                     request_dict['requester_profile'] = user_profile
                 else:
-                    # Fallback if profile not found
+                    # Safe fallback if profile not found
                     request_dict['requester_profile'] = {
                         'uid': request.requester_uid,
                         'username': f'User_{request.requester_uid[:8]}',
@@ -153,7 +160,10 @@ class GroupRequestRepo:
     
     @staticmethod
     def get_user_pending_requests(user_uid: str) -> List[Dict[str, Any]]:
-        """Get all pending requests sent by a user."""
+        """
+        Get all pending requests sent by a user for user's request management section.
+        
+        """
         try:
             requests = GroupRequest.query.filter_by(
                 requester_uid=user_uid,
@@ -171,13 +181,6 @@ class GroupRequestRepo:
         """
         Admin responds to a join request (accept/reject).
         
-        Args:
-            request_id: ID of the group request
-            admin_uid: Firebase UID of the admin responding
-            accept: True to accept, False to reject
-            
-        Returns:
-            Dict with success status and message
         """
         try:
             # Get the request
@@ -194,7 +197,7 @@ class GroupRequestRepo:
                     "error": "Request has already been processed"
                 }
             
-            # Verify admin has permission
+            # Verify admin authorization
             from app.repositories.group_repo import GroupRepo
             if not GroupRepo.is_admin(request.group_id, admin_uid):
                 return {
@@ -238,7 +241,10 @@ class GroupRequestRepo:
     
     @staticmethod
     def get_request_by_id(request_id: int) -> Optional[Dict[str, Any]]:
-        """Get a specific group request by ID."""
+        """
+        Get a specific group request by ID.
+        
+        """
         try:
             request = GroupRequest.query.get(request_id)
             return request.to_dict() if request else None

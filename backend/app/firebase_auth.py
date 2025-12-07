@@ -1,12 +1,16 @@
-# app/firebase_auth.py
+"""
+Provides and authentication decorator for Firebase token verification.
+Injects uid and email into Flask g context for protected routes
+
+"""
 
 import firebase_admin
 from firebase_admin import auth, credentials
 from flask import request, g
 import os
-from functools import wraps   # move this to the top
+from functools import wraps  
 
-# Initialize Firebase Admin app ONLY once
+# Initialize Firebase Admin app once
 if not firebase_admin._apps:
     cred_path = os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH")
     firebase_admin.initialize_app(credentials.Certificate(cred_path))
@@ -22,9 +26,8 @@ def firebase_auth_required(f):
 
     @wraps(f)
     def wrapper(*args, **kwargs):
-        # 🔴 IMPORTANT: Let CORS preflight through with no auth
+        # !!! Let CORS preflight through with no auth
         if request.method == "OPTIONS":
-            # 204 No Content is fine; Flask-CORS (if you use it) will add headers
             return ("", 204)
 
         auth_header = request.headers.get("Authorization", "")

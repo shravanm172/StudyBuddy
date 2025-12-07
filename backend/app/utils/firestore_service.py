@@ -15,7 +15,10 @@ class FirestoreService:
         self._initialize_firestore()
     
     def _initialize_firestore(self):
-        """Initialize Firestore with service account credentials"""
+        """
+        Initialize Firestore with service account credentials
+        
+        """
         try:
             # Check if Firebase is already initialized
             if not firebase_admin._apps:
@@ -43,8 +46,8 @@ class FirestoreService:
     
     def sync_group_member_add(self, group_id: str, user_uid: str, username: str = None, role: str = "member"):
         """
-        Add a user to the group's member list in Firestore
-        This enables them to access the group chat
+        Add a user to the group's member list in Firestore to enable them to access the group chat
+
         """
         try:
             member_doc_id = f"{group_id}_{user_uid}"
@@ -57,7 +60,7 @@ class FirestoreService:
                 'is_active': True
             }
             
-            # Add to groupMembers collection for security rules
+            # Add to groupMembers collection 
             self.db.collection('groupMembers').document(member_doc_id).set(member_data)
             
             logger.info(f"Added user {user_uid} to group {group_id} in Firestore")
@@ -69,8 +72,8 @@ class FirestoreService:
     
     def sync_group_member_remove(self, group_id: str, user_uid: str):
         """
-        Remove a user from the group's member list in Firestore
-        This revokes their access to the group chat
+        Remove a user from the group's member list in Firestore which revokes their access to the group chat
+
         """
         try:
             member_doc_id = f"{group_id}_{user_uid}"
@@ -91,10 +94,8 @@ class FirestoreService:
     
     def sync_all_group_members(self, group_id: str, members_list: list):
         """
-        Sync all members of a group to Firestore
-        Useful for initial setup or bulk updates
+        Sync all members of a group to Firestore for intial setup or full refresh.
         
-        members_list should be a list of dicts with keys: user_uid, username, role
         """
         try:
             batch = self.db.batch()
@@ -149,6 +150,7 @@ class FirestoreService:
     def get_group_members_from_firestore(self, group_id: str):
         """
         Get all members of a group from Firestore
+
         """
         try:
             members = []
@@ -167,6 +169,7 @@ class FirestoreService:
     def cleanup_group_chat_data(self, group_id: str):
         """
         Clean up all chat data for a group when the group is deleted
+
         """
         try:
             batch = self.db.batch()
@@ -201,5 +204,5 @@ class FirestoreService:
             return False
 
 
-# Create a singleton instance
+# Create a single instance oif FirestoreService to be used throughout the app
 firestore_service = FirestoreService()

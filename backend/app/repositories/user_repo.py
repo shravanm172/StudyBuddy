@@ -1,3 +1,15 @@
+"""
+User Repository
+Handles user account creation, profile management, and course enrollments
+
+Methods:
+- create_user_with_profile(uid, username, email, profile, courses) - Create or update user with profile and courses
+- get_user(uid)                                      - Get user profile by Firebase UID
+- get_user_by_username(username)                     - Get user profile by username
+- is_username_taken(username, exclude_uid)           - Check if username is already taken
+- get_all_users(exclude_uid)                         - Get all users for building People Feed
+"""
+
 from app import db
 from app.models.user import User, UserProfile, UserCourse, Course, Gender, Grade
 from sqlalchemy.exc import IntegrityError
@@ -7,23 +19,17 @@ class UserRepo:
     @staticmethod
     def create_user_with_profile(uid, username, email, profile, courses):
         """
-        Create or update a user + profile + enrolled courses.
-
-        profile = {
-            "date_of_birth": date object (datetime.date),
-            "grade": Grade enum or string,
-            "gender": Gender enum or string,
-        }
-        courses = [course_id, ...]
+        Create or update a user + profile + course enrollements.
+        
         """
         try:
-            # Convert string values to enums if needed
+            # Convert string values to enums 
             if isinstance(profile["grade"], str):
                 profile["grade"] = Grade(profile["grade"])
             if isinstance(profile["gender"], str):
                 profile["gender"] = Gender(profile["gender"])
                 
-            # Upsert user
+            # Update or insert user
             user = User.query.get(uid)
             if not user:
                 user = User(uid=uid, username=username, email=email)
@@ -32,7 +38,7 @@ class UserRepo:
                 user.username = username
                 user.email = email
 
-            # Upsert profile
+            # Update or insert profile
             user_profile = UserProfile.query.get(uid)
             if not user_profile:
                 user_profile = UserProfile(
@@ -49,7 +55,7 @@ class UserRepo:
 
             # Replace course enrollments
             UserCourse.query.filter_by(uid=uid).delete()
-            # de-dupe courses just in case
+            # Prevent duplicate course enrollments
             for course_id in set(courses):
                 db.session.add(UserCourse(uid=uid, course_id=course_id))
 
@@ -65,7 +71,8 @@ class UserRepo:
     @staticmethod
     def get_user(uid):
         """
-        Return user + profile + courses as a dict, or None if not found.
+        Return user + profile + courses as a dict, or none if not found.
+
         """
         result = (
             db.session.query(User, UserProfile)
@@ -84,16 +91,17 @@ class UserRepo:
             "uid": user_obj.uid,
             "username": user_obj.username,
             "email": user_obj.email,
-            "date_of_birth": profile.date_of_birth.isoformat() if profile.date_of_birth else None,  # Convert to YYYY-MM-DD string
-            "grade": profile.grade.value,  # Convert enum to string value
-            "gender": profile.gender.value,  # Convert enum to string value
+            "date_of_birth": profile.date_of_birth.isoformat() if profile.date_of_birth else None,  
+            "grade": profile.grade.value, 
+            "gender": profile.gender.value,  
             "courses": courses,
         }
 
     @staticmethod
     def get_user_by_username(username):
         """
-        Return user by username, or None if not found.
+        Return user by username, or none if not found.
+
         """
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -104,6 +112,7 @@ class UserRepo:
     def is_username_taken(username, exclude_uid=None):
         """
         Check if username is already taken by another user.
+
         """
         query = User.query.filter_by(username=username)
         if exclude_uid:
@@ -115,6 +124,7 @@ class UserRepo:
         """
         Return all users with their profiles and courses as a list of dicts.
         Excludes the specified UID if provided.
+
         """
         query = (
             db.session.query(User, UserProfile)

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Clear ALL data from the database and reseed courses.
+Clear all data from the database and reseed courses.
 This deletes all users, groups, requests, and courses, then reseeds courses.
-Perfect for starting completely fresh with clean test data.
+Use for starting completely fresh with clean test data.
 """
 
 from app import create_app, db
@@ -21,14 +21,13 @@ COURSES = [
 ]
 
 def clear_all_data_and_reseed():
-    """Clear ALL data from database and reseed courses."""
+    """Clear all data from database and reseed courses."""
     
     app = create_app()
     
     with app.app_context():
         try:
-            print("🧹 Starting COMPLETE database cleanup...")
-            print("⚠️  This will delete ALL data including users!")
+            print(" Starting complete database cleanup...")
             
             # Get counts before deletion
             user_count = User.query.count()
@@ -37,14 +36,14 @@ def clear_all_data_and_reseed():
             group_request_count = GroupRequest.query.count()
             course_count = Course.query.count()
             
-            print(f"\n📊 Current data:")
+            print(f"\n Current data:")
             print(f"   - Users: {user_count}")
             print(f"   - Groups: {group_count}")
             print(f"   - Direct Requests: {direct_request_count}")
             print(f"   - Group Requests: {group_request_count}")
             print(f"   - Courses: {course_count}")
             
-            print("\n🗑️  Deleting all data...")
+            print("\n Deleting all data...")
             
             # Delete in correct order due to foreign key constraints
             
@@ -86,33 +85,33 @@ def clear_all_data_and_reseed():
             
             # Commit deletions
             db.session.commit()
-            print("✅ All data deleted!")
+            print("All data deleted!")
             
             # Reseed courses
-            print("\n📚 Reseeding courses...")
+            print("\n Reseeding courses...")
             for course_id, title in COURSES:
                 course = Course(course_id=course_id, title=title)
                 db.session.add(course)
                 print(f"   + {course_id}: {title}")
             
             db.session.commit()
-            print(f"✅ Seeded {len(COURSES)} courses!")
+            print(f" Seeded {len(COURSES)} courses!")
             
             # Verify final state
             final_course_count = Course.query.count()
             final_user_count = User.query.count()
             final_group_count = Group.query.count()
             
-            print(f"\n📊 Final database state:")
+            print(f"\n Final database state:")
             print(f"   - Users: {final_user_count}")
             print(f"   - Groups: {final_group_count}")
             print(f"   - Courses: {final_course_count}")
             
-            print("\n🎉 Database completely reset with fresh courses!")
+            print("\n Database completely reset with fresh courses!")
             print("   Ready for new test data.")
             
         except Exception as e:
-            print(f"\n❌ Error during cleanup: {e}")
+            print(f"\n Error during cleanup: {e}")
             db.session.rollback()
             raise
 
@@ -120,14 +119,12 @@ if __name__ == "__main__":
     import sys
     
     # Safety check - require confirmation
-    print("⚠️  WARNING: This will delete ALL data from the database!")
-    print("   This includes all users, groups, requests, and courses.")
-    print("   Courses will be reseeded afterwards.\n")
+    print(" WARNING: This will delete ALL data from the database!")
     
-    response = input("Are you sure you want to continue? (yes/no): ").strip().lower()
+    response = input("Continue? (yes/no): ").strip().lower()
     
     if response == "yes":
         clear_all_data_and_reseed()
     else:
-        print("❌ Operation cancelled.")
+        print("Operation cancelled.")
         sys.exit(0)

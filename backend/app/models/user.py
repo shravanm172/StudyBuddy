@@ -26,9 +26,7 @@ class User(db.Model):
 class UserProfile(db.Model):
     __tablename__ = "user_profiles"
     uid = db.Column(db.String, db.ForeignKey("users.uid"), primary_key=True)
-    # age = db.Column(db.Integer, nullable=False)      # ❌ remove
-    # school = db.Column(db.String, nullable=False)    # ❌ remove (you mentioned removing this too)
-    date_of_birth = db.Column(db.Date, nullable=False)  # ✅ new field
+    date_of_birth = db.Column(db.Date, nullable=False) 
     grade = db.Column(db.Enum(Grade), nullable=False)
     gender = db.Column(db.Enum(Gender), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
